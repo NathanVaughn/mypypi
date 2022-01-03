@@ -7,6 +7,7 @@ import flask
 import requests
 from loguru import logger
 
+import app.libraries.hash
 from app.libraries.url import get_filename
 from app.main import storage_backend
 
@@ -79,9 +80,7 @@ def proxy_url(url: str) -> str:
     Given a file url, return the proxy url.
     """
     # get or create a token for the url
-    token = storage_backend.get_url_token(url)
-    if token is None:
-        token = storage_backend.set_url_token(url)
+    hash_ = storage_backend.set_url_hash(url)
 
     # need to extract the url fragement, as it contains the hash
     parsed = urlparse(url)
@@ -92,9 +91,8 @@ def proxy_url(url: str) -> str:
     # determine an applicable version
     new_url = flask.url_for(
         "files.proxy",
+        hash_=hash_,
         filename=get_filename(url),
-        url=url,
-        token=token,
         _external=True,
     )
 
@@ -112,14 +110,14 @@ def proxy_urls(urls: List[str]) -> List[str]:
     """
     urls_to_process: List[str] = []
 
-    # make a list of urls that need tokens
+    # make a list of urls that need hashes
     for url in urls:
-        token = storage_backend.get_url_token(url)
-        if token is None:
+        hash_ = app.libraries.hash.sha256_string(url)
+        if not storage_backend.get_url_from_hash(hash_):
             urls_to_process.append(url)
 
-    # generate bulk tokens
-    storage_backend.set_url_tokens(urls_to_process)
+    # generate bulk hashes
+    storage_backend.set_url_hashes(urls_to_process)
 
     # now go through normal proxy_url function
     return [proxy_url(url) for url in urls]

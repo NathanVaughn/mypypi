@@ -30,21 +30,21 @@ class BaseStorage(abc.ABC):
         """
         raise NotImplementedError
 
-    def get_url_token(self, url: str) -> Optional[str]:
+    def get_url_from_hash(self, hash_: str) -> Optional[str]:
         """
-        Return the token of a url.
+        Return the url for a hash.
         Return None if not found.
         """
         raise NotImplementedError
 
-    def set_url_token(self, url: str) -> str:
+    def set_url_hash(self, url: str) -> str:
         """
-        Return the generated token of a url.
+        Return the generated hash of a url.
         """
         raise NotImplementedError
 
-    def set_url_tokens(self, urls: List[str]) -> List[str]:
+    def set_url_hashes(self, urls: List[str]) -> List[str]:
         """
-        Return the generated token of multiple urls.
+        Return the generated hash of multiple urls.
         """
         raise NotImplementedError

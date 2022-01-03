@@ -15,7 +15,7 @@ class BaseFiles(abc.ABC):
         """
         Given a remote file url, return the path to save/load the file.
         """
-        file_url_hash = app.libraries.hash.sha256_hash_string(file_url)
+        file_url_hash = app.libraries.hash.sha256_string(file_url)
 
         folder1 = file_url_hash[:2]
         folder2 = file_url_hash[2:4]
