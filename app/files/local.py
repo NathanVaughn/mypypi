@@ -1,8 +1,9 @@
 import os
 
+import flask
+
 import app.lib.hash
 import app.lib.url
-import flask
 from app.files.base import BaseFiles
 
 

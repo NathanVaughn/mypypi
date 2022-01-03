@@ -1,7 +1,9 @@
-import peewee as pw
 import secrets
-from app.storage.base import BaseStorage
 from typing import Optional, Tuple
+
+import peewee as pw
+
+from app.storage.base import BaseStorage
 
 db = pw.SqliteDatabase(None)
 

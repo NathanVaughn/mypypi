@@ -1,10 +1,10 @@
 import http
 import json
 
-import app.lib.proxy
-import app.lib.url
 import flask
 
+import app.lib.proxy
+import app.lib.url
 
 url_prefix = "pypi"
 url_postfix = "json"
@@ -35,7 +35,7 @@ def process_json(json_data: bytes) -> str:
 def project(projectname: str) -> flask.Response:
     # make request to upstream
     status_code, content, headers = app.lib.proxy.reverse_proxy(
-        f'{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{url_postfix}'
+        f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{url_postfix}"
     )
     if status_code != http.HTTPStatus.OK:
         return flask.Response(content, status_code, headers)
@@ -51,7 +51,7 @@ def project(projectname: str) -> flask.Response:
 def project_version(projectname: str, version: str) -> flask.Response:
     # make request to upstream
     status_code, content, headers = app.lib.proxy.reverse_proxy(
-        f'{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{version}/{url_postfix}'
+        f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{version}/{url_postfix}"
     )
 
     if status_code != http.HTTPStatus.OK:

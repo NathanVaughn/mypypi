@@ -1,15 +1,16 @@
 import http
 
-import app.lib.proxy
-import app.lib.url
 import bs4
 import flask
+
+import app.lib.proxy
+import app.lib.url
 
 url_prefix = "simple"
 simple_bp = flask.Blueprint("simple", __name__, url_prefix=f"/{url_prefix}")
 
 
-def process_html(html: bytes):
+def process_html(html: bytes) -> str:
     """
     Rewrite all file URLs in a simple page with our file proxy.
     """
@@ -21,10 +22,10 @@ def process_html(html: bytes):
 
 
 @simple_bp.route("/<string:projectname>/")
-def project(projectname: str):
+def project(projectname: str) -> flask.Response:
     # make request to upstream
     status_code, content, headers = app.lib.proxy.reverse_proxy(
-        f'{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}'
+        f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}"
     )
 
     if status_code != http.HTTPStatus.OK:

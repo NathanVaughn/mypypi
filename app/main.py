@@ -1,7 +1,7 @@
 import os
 
-from flask import Flask
 from dynaconf import FlaskDynaconf
+from flask import Flask
 
 import app.files.base
 import app.storage.base
