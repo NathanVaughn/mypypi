@@ -3,8 +3,8 @@ import json
 
 import flask
 
-import app.lib.proxy
-import app.lib.url
+import app.libraries.proxy
+import app.libraries.url
 
 url_prefix = "pypi"
 url_postfix = "json"
@@ -21,12 +21,12 @@ def process_json(json_data: bytes) -> str:
     releases = data["releases"]
     for release in releases:
         for url in releases[release]:
-            url["url"] = app.lib.url.proxy_url(url["url"])
+            url["url"] = app.libraries.url.proxy_url(url["url"])
 
     # gor the urls in the urls
     urls = data["urls"]
     for url in urls:
-        url["url"] = app.lib.url.proxy_url(url["url"])
+        url["url"] = app.libraries.url.proxy_url(url["url"])
 
     return json.dumps(data, indent=4)
 
@@ -34,7 +34,7 @@ def process_json(json_data: bytes) -> str:
 @json_bp.route("/<string:projectname>/json")
 def project(projectname: str) -> flask.Response:
     # make request to upstream
-    status_code, content, headers = app.lib.proxy.reverse_proxy(
+    status_code, content, headers = app.libraries.proxy.reverse_proxy(
         f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{url_postfix}"
     )
     if status_code != http.HTTPStatus.OK:
@@ -50,7 +50,7 @@ def project(projectname: str) -> flask.Response:
 @json_bp.route("/<string:projectname>/<string:version>/json")
 def project_version(projectname: str, version: str) -> flask.Response:
     # make request to upstream
-    status_code, content, headers = app.lib.proxy.reverse_proxy(
+    status_code, content, headers = app.libraries.proxy.reverse_proxy(
         f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{version}/{url_postfix}"
     )
 

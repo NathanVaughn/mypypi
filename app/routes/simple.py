@@ -3,8 +3,8 @@ import http
 import bs4
 import flask
 
-import app.lib.proxy
-import app.lib.url
+import app.libraries.proxy
+import app.libraries.url
 
 url_prefix = "simple"
 simple_bp = flask.Blueprint("simple", __name__, url_prefix=f"/{url_prefix}")
@@ -16,7 +16,7 @@ def process_html(html: bytes) -> str:
     """
     soup = bs4.BeautifulSoup(html, "html.parser")
     for a_tag in soup.find_all("a"):
-        a_tag["href"] = app.lib.url.proxy_url(a_tag["href"])
+        a_tag["href"] = app.libraries.url.proxy_url(a_tag["href"])
 
     return soup.prettify()
 
@@ -24,7 +24,7 @@ def process_html(html: bytes) -> str:
 @simple_bp.route("/<string:projectname>/")
 def project(projectname: str) -> flask.Response:
     # make request to upstream
-    status_code, content, headers = app.lib.proxy.reverse_proxy(
+    status_code, content, headers = app.libraries.proxy.reverse_proxy(
         f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}"
     )
 

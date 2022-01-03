@@ -2,8 +2,8 @@ import os
 
 import flask
 
-import app.lib.hash
-import app.lib.url
+import app.libraries.hash
+import app.libraries.url
 from app.files.base import BaseFiles
 
 
@@ -15,12 +15,12 @@ class LocalFiles(BaseFiles):
 
     def build_path(self, file_url: str) -> str:
         # build path to the file using similar strategy to PyPi
-        file_url_hash = app.lib.hash.sha256_hash_string(file_url)
+        file_url_hash = app.libraries.hash.sha256_hash_string(file_url)
 
         folder1 = file_url_hash[:2]
         folder2 = file_url_hash[2:4]
         folder3 = file_url_hash[4:]
-        filename = app.lib.url.get_filename(file_url)
+        filename = app.libraries.url.get_filename(file_url)
 
         return os.path.join(folder1, folder2, folder3, filename)
 
