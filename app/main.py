@@ -2,6 +2,7 @@ import os
 
 from dynaconf import FlaskDynaconf
 from flask import Flask
+from flask_caching import Cache
 
 import app.files.base
 import app.storage.base
@@ -13,24 +14,30 @@ FlaskDynaconf(flask_app, ENVVAR_PREFIX="MYPYPI")
 # Configure Flask before setting up routes
 # =============================================================================
 
+# dictionary syntax needs to be used so the updated settings copy correctly
+
+# caching
+if "CACHE_TYPE" not in flask_app.config:
+    flask_app.config["CACHE_TYPE"] = "SimpleCache"
+
+if "CACHE_DEFAULT_TIMEOUT" not in flask_app.config:
+    flask_app.config["CACHE_DEFAULT_TIMEOUT"] = 30 * 60
+
 # config upstream
 if "UPSTREAM_URL" not in flask_app.config:
-    flask_app.config.UPSTREAM_URL = "https://pypi.org"
-flask_app.config.UPSTREAM_URL = flask_app.config.UPSTREAM_URL.rstrip("/")
-
-if "UPSTREAM_TTL" not in flask_app.config:
-    flask_app.config.UPSTREAM_TTL = 30 * 60
+    flask_app.config["UPSTREAM_URL"] = "https://pypi.org"
+flask_app.config["UPSTREAM_URL"] = flask_app.config.UPSTREAM_URL.rstrip("/")
 
 # data
 if "DATA_DIRECTORY" not in flask_app.config:
-    flask_app.config.DATA_DIRECTORY = "data"
+    flask_app.config["DATA_DIRECTORY"] = "data"
 
 # files
 if "FILE_STORAGE" not in flask_app.config:
-    flask_app.config.FILE_STORAGE = "local"
+    flask_app.config["FILE_STORAGE"] = "local"
 
 if "LOCAL_FILES_DIRECTORY" not in flask_app.config:
-    flask_app.config.LOCAL_FILES_DIRECTORY = "files"
+    flask_app.config["LOCAL_FILES_DIRECTORY"] = "files"
 
 # build path to store files
 files_dir = os.path.join(
@@ -40,11 +47,17 @@ files_dir = os.path.join(
 
 # persistent storage
 if "SQLITE_FILENAME" not in flask_app.config:
-    flask_app.config.SQLITE_FILENAME = "database.sqlite"
+    flask_app.config["SQLITE_FILENAME"] = "database.sqlite"
 
 sqlite_file_path = os.path.join(
     flask_app.config.DATA_DIRECTORY, flask_app.config.SQLITE_FILENAME
 )
+
+# =============================================================================
+# Set up extensions
+# =============================================================================
+
+cache = Cache(flask_app)
 
 # =============================================================================
 # Set up backends

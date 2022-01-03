@@ -1,5 +1,6 @@
+import os
 import secrets
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import peewee as pw
 
@@ -30,6 +31,8 @@ class URLCache(BaseModel):
 
 class SQLStorage(BaseStorage):
     def __init__(self, file_path: str) -> None:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
         db.init(file_path)
         db.create_tables([URLToken, URLCache])
 
@@ -87,3 +90,10 @@ class SQLStorage(BaseStorage):
         URLToken.create(url=url, token=token)
 
         return token
+
+    def set_url_tokens(self, urls: List[str]) -> List[str]:
+        urltokens = [URLToken(url=url, token=secrets.token_hex(64)) for url in urls]
+        with db.atomic():
+            URLToken.bulk_create(urltokens, batch_size=100)
+
+        return [str(urltoken.token) for urltoken in urltokens]

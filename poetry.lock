@@ -219,6 +219,17 @@ async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
 
 [[package]]
+name = "flask-caching"
+version = "1.10.1"
+description = "Adds caching support to your Flask application"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+Flask = "*"
+
+[[package]]
 name = "frozenlist"
 version = "1.2.0"
 description = "A list-like structure which implements collections.abc.MutableSequence"
@@ -531,7 +542,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "bda431457538e05cfd591224db34e1330b9a82209ab772548c2027409950ad0a"
+content-hash = "968b9a3d3e9cd6376ed9e8e9c48b9b8e54fdc8faa3f81f355430a4aae854cbc3"
 
 [metadata.files]
 aiobotocore = [
@@ -665,6 +676,10 @@ dynaconf = [
 flask = [
     {file = "Flask-2.0.2-py3-none-any.whl", hash = "sha256:cb90f62f1d8e4dc4621f52106613488b5ba826b2e1e10a33eac92f723093ab6a"},
     {file = "Flask-2.0.2.tar.gz", hash = "sha256:7b2fb8e934ddd50731893bdcdb00fc8c0315916f9fcd50d22c7cc1a95ab634e2"},
+]
+flask-caching = [
+    {file = "Flask-Caching-1.10.1.tar.gz", hash = "sha256:cf19b722fcebc2ba03e4ae7c55b532ed53f0cbf683ce36fafe5e881789a01c00"},
+    {file = "Flask_Caching-1.10.1-py3-none-any.whl", hash = "sha256:bcda8acbc7508e31e50f63e9b1ab83185b446f6b6318bd9dd1d45626fba2e903"},
 ]
 frozenlist = [
     {file = "frozenlist-1.2.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:977a1438d0e0d96573fd679d291a1542097ea9f4918a8b6494b06610dfeefbf9"},

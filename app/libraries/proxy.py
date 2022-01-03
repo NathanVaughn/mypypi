@@ -25,7 +25,9 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     Makes reverse proxy request and returns the response object, and applicable headers
     """
     # if a record exists and is still valid
-    if storage_backend.is_url_cache_valid(url, flask.current_app.config.UPSTREAM_TTL):
+    if storage_backend.is_url_cache_valid(
+        url, flask.current_app.config.CACHE_DEFAULT_TIMEOUT
+    ):
         return use_cache(url)
 
     # make request to upstream
@@ -102,3 +104,22 @@ def proxy_url(url: str) -> str:
         new_url = f"{new_url}#{fragment}"
 
     return new_url
+
+
+def proxy_urls(urls: List[str]) -> List[str]:
+    """
+    Given a file url, return the proxy url.
+    """
+    urls_to_process: List[str] = []
+
+    # make a list of urls that need tokens
+    for url in urls:
+        token = storage_backend.get_url_token(url)
+        if token is None:
+            urls_to_process.append(url)
+
+    # generate bulk tokens
+    storage_backend.set_url_tokens(urls_to_process)
+
+    # now go through normal proxy_url function
+    return [proxy_url(url) for url in urls]

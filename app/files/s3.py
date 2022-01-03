@@ -1,8 +1,9 @@
 from typing import Optional
 
 import flask
-from loguru import logger
 import s3fs
+from loguru import logger
+
 from app.files.base import BaseFiles
 
 
@@ -46,11 +47,11 @@ class S3Files(BaseFiles):
             for chunk in self.download(file_url):
                 f.write(chunk)  # type: ignore
 
-        return self.fs.url(file_path)  # type: ignore
+        return self.fs.url(file_path, expires=10 * 60)  # type: ignore
 
     def retrieve(self, file_url: str) -> flask.Response:
         file_path = self.build_path(file_url)
-        return_url = self.fs.url(file_path)
+        return_url = self.fs.url(file_path, expires=10 * 60)
 
         logger.debug(f"Retrieving redirect url for {file_url} to {return_url}")
-        return flask.redirect(return_url) # type: ignore
+        return flask.redirect(return_url)  # type: ignore

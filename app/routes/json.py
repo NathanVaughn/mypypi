@@ -4,6 +4,7 @@ import json
 import flask
 
 import app.libraries.proxy
+from app.main import cache
 
 url_prefix = "pypi"
 url_postfix = "json"
@@ -31,6 +32,7 @@ def process_json(json_data: bytes) -> str:
 
 
 @json_bp.route("/<string:projectname>/json")
+@cache.cached()
 def project(projectname: str) -> flask.Response:
     # make request to upstream
     status_code, content, headers = app.libraries.proxy.reverse_proxy(
@@ -47,6 +49,7 @@ def project(projectname: str) -> flask.Response:
 
 
 @json_bp.route("/<string:projectname>/<string:version>/json")
+@cache.cached()
 def project_version(projectname: str, version: str) -> flask.Response:
     # make request to upstream
     status_code, content, headers = app.libraries.proxy.reverse_proxy(

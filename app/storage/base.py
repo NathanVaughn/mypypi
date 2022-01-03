@@ -1,5 +1,5 @@
 import abc
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 
 class BaseStorage(abc.ABC):
@@ -40,5 +40,11 @@ class BaseStorage(abc.ABC):
     def set_url_token(self, url: str) -> str:
         """
         Return the generated token of a url.
+        """
+        raise NotImplementedError
+
+    def set_url_tokens(self, urls: List[str]) -> List[str]:
+        """
+        Return the generated token of multiple urls.
         """
         raise NotImplementedError

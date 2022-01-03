@@ -1,25 +1,26 @@
 [tool.poetry]
-name = "mypypi"
-version = "0.1.0"
-description = "PyPi pull-through cache"
-authors = ["Nathan Vaughn <nvaughn51@gmail.com>"]
+    name        = "mypypi"
+    version     = "0.1.0"
+    description = "PyPi pull-through cache"
+    authors     = ["Nathan Vaughn <nvaughn51@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-requests = "^2.26.0"
-Flask = "^2.0.2"
-loguru = "^0.5.3"
-peewee = "^3.14.8"
-beautifulsoup4 = "^4.10.0"
-dynaconf = "^3.1.7"
-s3fs = "^2021.11.1"
+    python         = "^3.9"
+    Flask          = "^2.0.2"
+    Flask-Caching  = "^1.10.1"    # additional layer of caching
+    requests       = "^2.26.0"    # http requests
+    loguru         = "^0.5.3"     # logging
+    peewee         = "^3.14.8"    # sql
+    beautifulsoup4 = "^4.10.0"    # html parsing
+    dynaconf       = "^3.1.7"     # config
+    s3fs           = "^2021.11.1" # s3
 
 [tool.poetry.dev-dependencies]
-black = "^21.12b0"
-isort = "^5.10.1"
-autoflake = "^1.4"
-pyleft = "^1.0.1"
+    black     = "^21.12b0"
+    isort     = "^5.10.1"
+    autoflake = "^1.4"
+    pyleft    = "^1.0.1"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+    requires      = ["poetry-core>=1.0.0"]
+    build-backend = "poetry.core.masonry.api"
