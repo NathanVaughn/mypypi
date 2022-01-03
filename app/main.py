@@ -26,6 +26,9 @@ if "DATA_DIRECTORY" not in flask_app.config:
     flask_app.config.DATA_DIRECTORY = "data"
 
 # files
+if "FILE_STORAGE" not in flask_app.config:
+    flask_app.config.FILE_STORAGE = "local"
+
 if "LOCAL_FILES_DIRECTORY" not in flask_app.config:
     flask_app.config.LOCAL_FILES_DIRECTORY = "files"
 
@@ -39,7 +42,7 @@ files_dir = os.path.join(
 if "SQLITE_FILENAME" not in flask_app.config:
     flask_app.config.SQLITE_FILENAME = "database.sqlite"
 
-sqlite_filepath = os.path.join(
+sqlite_file_path = os.path.join(
     flask_app.config.DATA_DIRECTORY, flask_app.config.SQLITE_FILENAME
 )
 
@@ -50,11 +53,26 @@ sqlite_filepath = os.path.join(
 # order matters, files depends on persistent storage
 import app.storage.sql
 
-storage_backend = app.storage.sql.SQLStorage(sqlite_filepath)
+storage_backend = app.storage.sql.SQLStorage(sqlite_file_path)
 
-import app.files.local
 
-file_backend = app.files.local.LocalFiles(files_dir)
+# setup file storage
+if flask_app.config.FILE_STORAGE == "local":
+    import app.files.local
+
+    file_backend = app.files.local.LocalFiles(files_dir)
+elif flask_app.config.FILE_STORAGE == "s3":
+    import app.files.s3
+
+    file_backend = app.files.s3.S3Files(
+        flask_app.config.S3_BUCKET,
+        flask_app.config.S3_ACCESS_KEY,
+        flask_app.config.S3_SECRET_KEY,
+        endpoint_url=flask_app.config.get("S3_ENDPOINT_URL", None),
+        region_name=flask_app.config.get("S3_REGION", None),
+    )
+else:
+    raise ValueError("Invalid file storage backend")
 
 # =============================================================================
 # Set up routes

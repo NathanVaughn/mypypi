@@ -12,7 +12,9 @@ RUN python -m pip install pip wheel --upgrade && \
 # add gunicorn
 RUN python -m pip install gunicorn
 
+# copy everything else in
 COPY . .
 
 # run server
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:flask_app"]
+EXPOSE 80
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "wsgi:flask_app"]

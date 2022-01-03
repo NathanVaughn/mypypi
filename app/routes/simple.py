@@ -4,7 +4,6 @@ import bs4
 import flask
 
 import app.libraries.proxy
-import app.libraries.url
 
 url_prefix = "simple"
 simple_bp = flask.Blueprint("simple", __name__, url_prefix=f"/{url_prefix}")
@@ -16,7 +15,7 @@ def process_html(html: bytes) -> str:
     """
     soup = bs4.BeautifulSoup(html, "html.parser")
     for a_tag in soup.find_all("a"):
-        a_tag["href"] = app.libraries.url.proxy_url(a_tag["href"])
+        a_tag["href"] = app.libraries.proxy.proxy_url(a_tag["href"])
 
     return soup.prettify()
 

@@ -4,7 +4,6 @@ import json
 import flask
 
 import app.libraries.proxy
-import app.libraries.url
 
 url_prefix = "pypi"
 url_postfix = "json"
@@ -21,12 +20,12 @@ def process_json(json_data: bytes) -> str:
     releases = data["releases"]
     for release in releases:
         for url in releases[release]:
-            url["url"] = app.libraries.url.proxy_url(url["url"])
+            url["url"] = app.libraries.proxy.proxy_url(url["url"])
 
     # gor the urls in the urls
     urls = data["urls"]
     for url in urls:
-        url["url"] = app.libraries.url.proxy_url(url["url"])
+        url["url"] = app.libraries.proxy.proxy_url(url["url"])
 
     return json.dumps(data, indent=4)
 

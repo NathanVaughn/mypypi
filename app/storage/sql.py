@@ -29,8 +29,8 @@ class URLCache(BaseModel):
 
 
 class SQLStorage(BaseStorage):
-    def __init__(self, filepath: str) -> None:
-        db.init(filepath)
+    def __init__(self, file_path: str) -> None:
+        db.init(file_path)
         db.create_tables([URLToken, URLCache])
 
     def _get(self, url: str) -> Optional[URLCache]:
