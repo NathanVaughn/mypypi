@@ -1,8 +1,10 @@
 import os
 
 from dynaconf import FlaskDynaconf
-from flask import Flask
+from flask import Flask, request
+from flask.wrappers import Response
 from flask_caching import Cache
+from loguru import logger
 
 flask_app = Flask(__name__)
 FlaskDynaconf(flask_app, ENVVAR_PREFIX="MYPYPI")
@@ -97,3 +99,13 @@ flask_app.register_blueprint(json_bp)
 
 # our internal routes
 flask_app.register_blueprint(files_bp)
+
+# =============================================================================
+# Hooks
+# =============================================================================
+
+
+@flask_app.after_request
+def log_request(response: Response):
+    logger.info(f"{request.method} {request.full_path} {response.status_code}")
+    return response
