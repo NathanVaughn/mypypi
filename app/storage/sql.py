@@ -21,14 +21,14 @@ class URLCache(BaseModel):
     status_code = pw.IntegerField()
     headers = pw.TextField()  # stored as json
     content = pw.BlobField()
-    time_created = pw.DateTimeField(default=pw.datetime.datetime.now)
+    time_created = pw.DateTimeField(default=datetime.datetime.now)
 
 
 # table to hold our hashes and the urls they are associated with
 class FileURL(BaseModel):
     url = pw.TextField(unique=True)
     hash_ = pw.TextField(unique=True)
-    time_last_downloaded = pw.DateTimeField(default=pw.datetime.datetime.now)
+    time_last_downloaded = pw.DateTimeField(null=True)
 
 
 class SQLStorage(BaseStorage):
