@@ -17,16 +17,37 @@ def process_json(json_data: bytes) -> str:
     """
     data = json.loads(json_data)
 
+    # ===================================
     # go through the urls in the releases
     releases = data["releases"]
-    for release in releases:
-        for url in releases[release]:
-            url["url"] = app.libraries.proxy.proxy_url(url["url"])
 
-    # gor the urls in the urls
+    # make a list of all url objects that need updating
+    url_objects = []
+    for release in releases:
+        for url_obj in releases[release]:
+            url_objects.append(url_obj)
+
+    # generate all the proxy urls
+    proxy_urls = app.libraries.proxy.proxy_urls([u["url"] for u in url_objects])
+
+    # rewrite the url objects
+    for url_obj, proxy_url in zip(url_objects, proxy_urls):
+        url_obj["url"] = proxy_url
+
+    # ===================================
+    # go through the urls in the urls
     urls = data["urls"]
-    for url in urls:
-        url["url"] = app.libraries.proxy.proxy_url(url["url"])
+
+    # make a list of all url objects that need updating
+    # in this case, `urls` is a list of url objects
+    url_objects = urls
+
+    # generate all the proxy urls
+    proxy_urls = app.libraries.proxy.proxy_urls([u["url"] for u in url_objects])
+
+    # rewrite the url objects
+    for url_obj, proxy_url in zip(url_objects, proxy_urls):
+        url_obj["url"] = proxy_url
 
     return json.dumps(data, indent=4)
 

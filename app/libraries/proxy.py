@@ -7,12 +7,15 @@ import flask
 import requests
 from loguru import logger
 
-import app.libraries.hash
 from app.libraries.url import get_filename
 from app.main import storage_backend
 
 
 def use_cache(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
+    """
+    Loads the URL from cache and returns the
+    status code, response content, and applicable headers
+    """
     logger.debug(f"Using cache for {url}")
 
     result = storage_backend.get_url_cache(url)
@@ -23,7 +26,8 @@ def use_cache(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
 
 def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     """
-    Makes reverse proxy request and returns the response object, and applicable headers
+    Makes reverse proxy request and returns the
+    status code, response content, and applicable headers
     """
     # if a record exists and is still valid
     if storage_backend.is_url_cache_valid(
@@ -63,9 +67,6 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
         if name.lower() not in excluded_headers
     ]
 
-    # if we've made it this far, safe to delete old item from cache
-    storage_backend.del_url_cache(url)
-
     # insert new item into cache
     logger.debug(f"Inserting {url} into cache")
     storage_backend.set_url_cache(
@@ -80,7 +81,7 @@ def proxy_url(url: str) -> str:
     Given a file url, return the proxy url.
     """
     # get or create a token for the url
-    hash_ = storage_backend.set_url_hash(url)
+    hash_ = storage_backend.get_or_create_file_url_hash(url)
 
     # need to extract the url fragement, as it contains the hash
     parsed = urlparse(url)
@@ -108,16 +109,11 @@ def proxy_urls(urls: List[str]) -> List[str]:
     """
     Given a file url, return the proxy url.
     """
-    urls_to_process: List[str] = []
-
-    # make a list of urls that need hashes
-    for url in urls:
-        hash_ = app.libraries.hash.sha256_string(url)
-        if not storage_backend.get_url_from_hash(hash_):
-            urls_to_process.append(url)
-
-    # generate bulk hashes
-    storage_backend.set_url_hashes(urls_to_process)
+    # create database entries in bulk for urls not in the database
+    # more efficient than one at a time
+    storage_backend.create_file_url_hashes(
+        [url for url in urls if not storage_backend.get_hash_from_file_url(url)]
+    )
 
     # now go through normal proxy_url function
     return [proxy_url(url) for url in urls]

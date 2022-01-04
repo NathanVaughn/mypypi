@@ -4,9 +4,6 @@ from dynaconf import FlaskDynaconf
 from flask import Flask
 from flask_caching import Cache
 
-import app.files.base
-import app.storage.base
-
 flask_app = Flask(__name__)
 FlaskDynaconf(flask_app, ENVVAR_PREFIX="MYPYPI")
 
@@ -67,7 +64,6 @@ cache = Cache(flask_app)
 import app.storage.sql
 
 storage_backend = app.storage.sql.SQLStorage(sqlite_file_path)
-
 
 # setup file storage
 if flask_app.config.FILE_STORAGE == "local":

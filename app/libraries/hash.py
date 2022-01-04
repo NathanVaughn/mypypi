@@ -1,8 +1,9 @@
-import functools
 import hashlib
 
+from app.main import cache
 
-@functools.lru_cache(maxsize=None)
+
+@cache.memoize()
 def sha256_string(content: str) -> str:
     """
     Hash a string using SHA256. Cache results for repeated use.

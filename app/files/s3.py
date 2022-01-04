@@ -55,3 +55,8 @@ class S3Files(BaseFiles):
 
         logger.debug(f"Retrieving redirect url for {file_url} to {return_url}")
         return flask.redirect(return_url)  # type: ignore
+
+    def delete(self, file_url: str) -> None:
+        file_path = self.build_path(file_url)
+        logger.debug(f"Deleting file {file_path}")
+        self.fs.remove(file_path)

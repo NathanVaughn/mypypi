@@ -8,6 +8,7 @@ from loguru import logger
 
 import app.libraries.hash
 import app.libraries.url
+from app.main import storage_backend
 
 
 class BaseFiles(abc.ABC):
@@ -41,6 +42,8 @@ class BaseFiles(abc.ABC):
         if not self.check(file_url):
             self.save(file_url)
 
+        storage_backend.update_file_url_last_downloaded_time(file_url)
+
         return self.retrieve(file_url)
 
     def check(self, file_url: str) -> bool:
@@ -59,5 +62,11 @@ class BaseFiles(abc.ABC):
         """
         Given a remote file url, return a flask response.
         We must have the file already.
+        """
+        raise NotImplementedError
+
+    def delete(self, file_url: str) -> None:
+        """
+        Given a remote file url, delete the file from our storage.
         """
         raise NotImplementedError

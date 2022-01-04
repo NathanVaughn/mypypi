@@ -16,11 +16,13 @@ def process_html(html: bytes) -> str:
     """
     soup = bs4.BeautifulSoup(html, "html.parser")
 
+    # get all anchor tags
     a_tags = soup.find_all("a")
 
-    urls = [a["href"] for a in a_tags]
-    proxy_urls = app.libraries.proxy.proxy_urls(urls)
+    # generate all the proxy urls
+    proxy_urls = app.libraries.proxy.proxy_urls([a["href"] for a in a_tags])
 
+    # rewrite the anchor tags
     for a_tag, proxy_url in zip(a_tags, proxy_urls):
         a_tag["href"] = proxy_url
 

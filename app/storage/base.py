@@ -30,21 +30,40 @@ class BaseStorage(abc.ABC):
         """
         raise NotImplementedError
 
-    def get_url_from_hash(self, hash_: str) -> Optional[str]:
+    def get_file_url_from_hash(self, hash_: str) -> Optional[str]:
         """
         Return the url for a hash.
         Return None if not found.
         """
         raise NotImplementedError
 
-    def set_url_hash(self, url: str) -> str:
+    def get_hash_from_file_url(self, url: str) -> Optional[str]:
+        """
+        Return the hash for a url.
+        Return None if not found.
+        """
+        raise NotImplementedError
+
+    def get_or_create_file_url_hash(self, url: str) -> str:
         """
         Return the generated hash of a url.
         """
         raise NotImplementedError
 
-    def set_url_hashes(self, urls: List[str]) -> List[str]:
+    def create_file_url_hashes(self, urls: List[str]) -> List[str]:
         """
         Return the generated hash of multiple urls.
+        """
+        raise NotImplementedError
+
+    def update_file_url_last_downloaded_time(self, url: str) -> None:
+        """
+        Update the last download time of a url.
+        """
+        raise NotImplementedError
+
+    def delete_older_than_days(self, days: int) -> None:
+        """
+        Delete all urls that were downloaded more than days ago.
         """
         raise NotImplementedError
