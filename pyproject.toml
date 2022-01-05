@@ -1,6 +1,6 @@
 [tool.poetry]
     name        = "mypypi"
-    version     = "1.0.0"
+    version     = "1.0.1"
     description = "PyPi pull-through cache"
     authors     = ["Nathan Vaughn <nvaughn51@gmail.com>"]
     readme      = "README.md"
@@ -18,6 +18,7 @@
     peewee          = "^3.14.8"    # SQL
     PyMySQL         = "^1.0.2"     # MySQL
     psycopg2-binary = "^2.9.3"     # PostgreSQL
+    redis           = "^4.1.0"     # Redis
 
 [tool.poetry.dev-dependencies]
     black     = "^21.12b0"
