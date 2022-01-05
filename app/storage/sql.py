@@ -33,7 +33,7 @@ class FileURL(BaseModel):
 
 class SQLStorage(BaseStorage):
     def __init__(self, database: pw.Database) -> None:
-        db.init(database)
+        db.initialize(database)
         db.create_tables([URLCache, FileURL])
 
     # ================================================================
