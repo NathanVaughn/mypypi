@@ -7,7 +7,7 @@ import peewee as pw
 import app.libraries.hash
 from app.storage.base import BaseStorage
 
-db = pw.SqliteDatabase(None)
+db = pw.DatabaseProxy()
 
 
 class BaseModel(pw.Model):
@@ -32,10 +32,8 @@ class FileURL(BaseModel):
 
 
 class SQLStorage(BaseStorage):
-    def __init__(self, file_path: str) -> None:
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
-        db.init(file_path)
+    def __init__(self, database: pw.Database) -> None:
+        db.init(database)
         db.create_tables([URLCache, FileURL])
 
     # ================================================================

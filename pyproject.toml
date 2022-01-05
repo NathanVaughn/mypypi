@@ -8,12 +8,14 @@
     python         = "^3.9"
     Flask          = "^2.0.2"
     Flask-Caching  = "^1.10.1"    # additional layer of caching
-    requests       = "^2.26.0"    # http requests
+    requests       = "^2.26.0"    # HTTP requests
     loguru         = "^0.5.3"     # logging
-    peewee         = "^3.14.8"    # sql
-    beautifulsoup4 = "^4.10.0"    # html parsing
+    beautifulsoup4 = "^4.10.0"    # HTML parsing
     dynaconf       = "^3.1.7"     # config
-    s3fs           = "^2021.11.1" # s3
+    s3fs           = "^2021.11.1" # S3
+    peewee         = "^3.14.8"    # SQL
+    PyMySQL        = "^1.0.2"     # MySQL
+    psycopg2       = "^2.9.3"     # PostgreSQL
 
 [tool.poetry.dev-dependencies]
     black     = "^21.12b0"
