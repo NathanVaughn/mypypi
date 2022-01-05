@@ -34,7 +34,6 @@ Additionally, you can set any of the settings from
 (you still need to add the `MYPYPI_` prefix to the setting name). By default,
 `SimpleCache` is used for `CACHE_TYPE`.
 
-
 ## Example Configs
 
 ### Simple
