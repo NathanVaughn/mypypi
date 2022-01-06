@@ -19,7 +19,7 @@ All environment variables should be prefixed with `MYPYPI_`.
 | `S3_BUCKET`              | If using S3 file storage, what bucket to store files in                                                                         |                                              |
 | `S3_ACCESS_KEY`          | If using S3 file storage, the access key to use                                                                                 |                                              |
 | `S3_SECRET_KEY`          | If using S3 file storage, the secret key to use. If the bucket is not public, this should have permission to create signed URLS |                                              |
-| `S3_ENDPOINT_URL`        | If using S3 file storage, alternative endpoint URL (not needed if using AWS)                                                    |                                              |
+| `S3_ENDPOINT_URL`        | If using S3 file storage, alternative endpoint URL (not needed if using AWS). Protocol (`https://`) is required.                |                                              |
 | `S3_REGION`              | If using S3 file storage, region to use (may be required depending on provider)                                                 |                                              |
 | `DATABASE_DRIVER`        | What database driver to use. Valid values are `sqlite`, `mysql`, or `postgres`                                                  | `sqlite`                                     |
 | `DATABASE_NAME`          | If not using the SQLite driver, database name to use                                                                            | `mypypi`                                     |

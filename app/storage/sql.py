@@ -1,5 +1,4 @@
 import datetime
-import os
 from typing import List, Optional, Tuple
 
 import peewee as pw
@@ -15,12 +14,20 @@ class BaseModel(pw.Model):
         database = db
 
 
+# while SQLite and Postgres can store up to 1GB in the blob field,
+# MySQL is capped at a whopping 64 KB. Thus, maintain a table of multiple
+# blob chunks that can be reconstructed.
+class BlobChunk(BaseModel):
+    key = pw.TextField()
+    order = pw.IntegerField()
+    content = pw.BlobField()
+
+
 # table to hold url caches
 class URLCache(BaseModel):
     url = pw.TextField(unique=True)
     status_code = pw.IntegerField()
     headers = pw.TextField()  # stored as json
-    content = pw.BlobField()
     time_created = pw.DateTimeField(default=datetime.datetime.now)
 
 
@@ -34,7 +41,7 @@ class FileURL(BaseModel):
 class SQLStorage(BaseStorage):
     def __init__(self, database: pw.Database) -> None:
         db.initialize(database)
-        db.create_tables([URLCache, FileURL])
+        db.create_tables([BlobChunk, URLCache, FileURL])
 
     # ================================================================
     # URL Cache
@@ -51,7 +58,11 @@ class SQLStorage(BaseStorage):
         if url_cache is None:
             return None
 
-        return int(url_cache.status_code), bytes(url_cache.content), str(url_cache.headers)  # type: ignore
+        # get the blobs
+        chunks = BlobChunk.select().where(BlobChunk.key == url).order_by(BlobChunk.order)  # type: ignore
+        content = b"".join([chunk.content for chunk in chunks])
+
+        return int(url_cache.status_code), bytes(content), str(url_cache.headers)  # type: ignore
 
     def del_url_cache(self, url: str) -> None:
         # delete an existing url cache
@@ -59,6 +70,9 @@ class SQLStorage(BaseStorage):
 
         if url_cache is not None:
             url_cache.delete_instance()
+
+        # delete the blobs
+        BlobChunk.delete().where(BlobChunk.key == url).execute()  # type: ignore
 
     def set_url_cache(
         self, url: str, status_code: int, content: bytes, headers: str
@@ -71,8 +85,21 @@ class SQLStorage(BaseStorage):
             url=url,
             status_code=status_code,
             headers=headers,
-            content=content,
         )
+
+        # split the return data into chunks
+        chunk_size = 65535 - 1000  # fudge factor
+        data_chunks = [
+            content[i : i + chunk_size] for i in range(0, len(content), chunk_size)
+        ]
+        chunks = [
+            BlobChunk(key=url, order=i, content=chunk)
+            for i, chunk in enumerate(data_chunks)
+        ]
+
+        # bulk create
+        with db.atomic():
+            BlobChunk.bulk_create(chunks, batch_size=100)
 
     def is_url_cache_valid(self, url: str, max_age: int) -> bool:
         # check if a url cache is still valid
