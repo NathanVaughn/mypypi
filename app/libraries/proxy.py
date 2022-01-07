@@ -11,7 +11,7 @@ from app.libraries.url import get_filename
 from app.main import storage_backend
 
 
-def use_cache(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
+def use_url_cache(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     """
     Loads the URL from cache and returns the
     status code, response content, and applicable headers
@@ -26,30 +26,30 @@ def use_cache(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
 
 def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     """
-    Makes reverse proxy request and returns the
+    Proxies request and returns the
     status code, response content, and applicable headers
     """
+    logger.info(f"Proxying request to {url}")
+
     # if a record exists and is still valid
     if storage_backend.is_url_cache_valid(
         url, flask.current_app.config.CACHE_DEFAULT_TIMEOUT
     ):
-        return use_cache(url)
-
-    # make request to upstream
-    logger.info(f"Proxying request to {url}")
+        return use_url_cache(url)
 
     # if request fails, use cache
     try:
+        # make request to upstream
         resp = requests.get(url)
     except requests.exceptions.RequestException as e:
         logger.error(e)
-        return use_cache(url)
+        return use_url_cache(url)
 
     # if the request had an internal server error, or other type of similar error,
     # use cache
     if resp.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
         logger.error(f"Response had bad status code {resp.status_code}")
-        return use_cache(url)
+        return use_url_cache(url)
 
     # exclude certain headers
     excluded_headers = [
@@ -73,16 +73,13 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
         url, resp.status_code, resp.content, json.dumps(headers)
     )
 
-    return use_cache(url)
+    return use_url_cache(url)
 
 
-def proxy_url(url: str) -> str:
+def generate_proxy_file_url(url: str, hash_: str) -> str:
     """
-    Given a file url, return the proxy url.
+    Given a file url and hash, return the proxy url.
     """
-    # get or create a token for the url
-    hash_ = storage_backend.get_or_create_file_url_hash(url)
-
     # need to extract the url fragement, as it contains the hash
     parsed = urlparse(url)
     fragment = parsed.fragment
@@ -107,13 +104,11 @@ def proxy_url(url: str) -> str:
 
 def proxy_urls(urls: List[str]) -> List[str]:
     """
-    Given a file url, return the proxy url.
+    Given a list of file urls, return a list of proxy urls.
     """
     # create database entries in bulk for urls not in the database
     # more efficient than one at a time
-    storage_backend.create_file_url_hashes(
-        [url for url in urls if not storage_backend.get_hash_from_file_url(url)]
-    )
+    hashes = storage_backend.get_or_create_file_url_hashes(urls)
 
     # now go through normal proxy_url function
-    return [proxy_url(url) for url in urls]
+    return [generate_proxy_file_url(url, hash_) for url, hash_ in zip(urls, hashes)]

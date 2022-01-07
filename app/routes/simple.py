@@ -2,6 +2,7 @@ import http
 
 import bs4
 import flask
+from loguru import logger
 
 import app.libraries.proxy
 from app.main import cache
@@ -33,6 +34,7 @@ def process_html(html: bytes) -> str:
 @cache.cached()
 def project(projectname: str) -> flask.Response:
     # make request to upstream
+    logger.debug(f"Getting upstream simple for {projectname}")
     status_code, content, headers = app.libraries.proxy.reverse_proxy(
         f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}"
     )
@@ -41,6 +43,7 @@ def project(projectname: str) -> flask.Response:
         return flask.Response(content, status_code, headers)
 
     # process html
+    logger.debug(f"Processing HTML for {projectname}")
     new_html = process_html(content)
 
     # craft response

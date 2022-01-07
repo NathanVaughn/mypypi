@@ -1,8 +1,8 @@
+import urllib.parse
 from typing import Optional
 
 import flask
 import s3fs
-import urllib.parse
 from loguru import logger
 
 from app.files.base import BaseFiles

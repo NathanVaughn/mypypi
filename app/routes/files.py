@@ -11,6 +11,7 @@ files_bp = flask.Blueprint("files", __name__, url_prefix="/file")
 @files_bp.route("/<string:hash_>/<string:filename>")
 def proxy(hash_: str, filename: str) -> flask.Response:
     # validate hash
+    logger.debug(f"Validating URL hash {hash_}")
     url = storage_backend.get_file_url_from_hash(hash_)
 
     if url is None:

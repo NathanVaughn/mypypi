@@ -32,27 +32,13 @@ class BaseStorage(abc.ABC):
 
     def get_file_url_from_hash(self, hash_: str) -> Optional[str]:
         """
-        Return the url for a hash.
-        Return None if not found.
+        Return the url for a hash. Return None if not found.
         """
         raise NotImplementedError
 
-    def get_hash_from_file_url(self, url: str) -> Optional[str]:
+    def get_or_create_file_url_hashes(self, urls: List[str]) -> List[str]:
         """
-        Return the hash for a url.
-        Return None if not found.
-        """
-        raise NotImplementedError
-
-    def get_or_create_file_url_hash(self, url: str) -> str:
-        """
-        Return the generated hash of a url.
-        """
-        raise NotImplementedError
-
-    def create_file_url_hashes(self, urls: List[str]) -> List[str]:
-        """
-        Return the generated hash of multiple urls.
+        Get or create the hash for a list of urls.
         """
         raise NotImplementedError
 

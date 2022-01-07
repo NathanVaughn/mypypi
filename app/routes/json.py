@@ -2,6 +2,7 @@ import http
 import json
 
 import flask
+from loguru import logger
 
 import app.libraries.proxy
 from app.main import cache
@@ -56,6 +57,7 @@ def process_json(json_data: bytes) -> str:
 @cache.cached()
 def project(projectname: str) -> flask.Response:
     # make request to upstream
+    logger.debug(f"Getting upstream JSON for {projectname}")
     status_code, content, headers = app.libraries.proxy.reverse_proxy(
         f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{url_postfix}"
     )
@@ -63,6 +65,7 @@ def project(projectname: str) -> flask.Response:
         return flask.Response(content, status_code, headers)
 
     # process json
+    logger.debug(f"Processing JSON for {projectname}")
     new_json = process_json(content)
 
     # craft response
@@ -73,6 +76,7 @@ def project(projectname: str) -> flask.Response:
 @cache.cached()
 def project_version(projectname: str, version: str) -> flask.Response:
     # make request to upstream
+    logger.debug(f"Getting upstream JSON for {projectname}/{version}")
     status_code, content, headers = app.libraries.proxy.reverse_proxy(
         f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{version}/{url_postfix}"
     )
@@ -81,6 +85,7 @@ def project_version(projectname: str, version: str) -> flask.Response:
         return flask.Response(content, status_code, headers)
 
     # process json
+    logger.debug(f"Processing JSON for {projectname}/{version}")
     new_json = process_json(content)
 
     # craft response

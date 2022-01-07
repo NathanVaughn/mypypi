@@ -52,7 +52,7 @@ class SQLStorage(BaseStorage):
         # get a URLCache object
         logger.debug(f"Getting URL Cache object for {url}")
         result = URLCache.get_or_none(URLCache.url == url)
-        logger.debug(f"Result: {result}")
+        logger.debug(f"Result: {bool(result)}")
 
         return result
 
@@ -93,7 +93,7 @@ class SQLStorage(BaseStorage):
         logger.debug(f"Setting url cache for {url}")
 
         # delete url cache if it already exists
-        if self.get_url_cache(url) is not None:
+        if self._get_url_cache_obj(url) is not None:
             logger.debug(f"Deleteing existing url cache for {url}")
             self.del_url_cache(url)
 
@@ -102,6 +102,8 @@ class SQLStorage(BaseStorage):
             status_code=status_code,
             headers=headers,
         )
+
+        logger.debug(f"Creating blobs for {url}")
 
         # split the return data into chunks
         chunk_size = 65535 - 1000  # fudge factor
@@ -139,6 +141,7 @@ class SQLStorage(BaseStorage):
 
     def get_file_url_from_hash(self, hash_: str) -> Optional[str]:
         # get url from hash
+        logger.debug(f"Getting file url from hash {hash_}")
         file_url = FileURL.get_or_none(FileURL.hash_ == hash_)
 
         if file_url is None:
@@ -146,37 +149,31 @@ class SQLStorage(BaseStorage):
 
         return file_url.url
 
-    def get_hash_from_file_url(self, url: str) -> Optional[str]:
-        # get hash from url
-        file_url = FileURL.get_or_none(FileURL.url == url)
+    def get_or_create_file_url_hashes(self, urls: List[str]) -> List[str]:
+        logger.debug("Getting bulk list of hashes")
 
-        if file_url is None:
-            return None
+        # first, get urls that already exist
+        file_url_objs: List[FileURL] = FileURL.select(FileURL.url).where(FileURL.url.in_(urls)).execute()  # type: ignore
+        file_url_urls = [file_url.url for file_url in file_url_objs]
 
-        return file_url.hash_
-
-    def get_or_create_file_url_hash(self, url: str) -> str:
-        # get or create an entry for the url
-        hash_ = app.libraries.hash.sha256_string(url)
-
-        if self.get_file_url_from_hash(hash_) is None:
-            FileURL.create(url=url, hash_=hash_)
-
-        return hash_
-
-    def create_file_url_hashes(self, urls: List[str]) -> List[str]:
-        # generate list of objects
-        file_urls = [
+        # create new file url entries for the missing urls
+        new_file_urls = [
             FileURL(url=url, hash_=app.libraries.hash.sha256_string(url))
             for url in urls
+            if url not in file_url_urls
         ]
+
         # bulk create
         with db.atomic():
-            FileURL.bulk_create(file_urls, batch_size=100)
+            FileURL.bulk_create(new_file_urls, batch_size=100)
 
-        return [str(file_url.hash_) for file_url in file_urls]
+        # now, get the hashes for all the urls
+        file_url_objs: List[FileURL] = FileURL.select(FileURL.hash_).where(FileURL.url.in_(urls)).execute()  # type: ignore
+        return [str(url.hash_) for url in file_url_objs]
 
     def update_file_url_last_downloaded_time(self, url: str) -> None:
+        logger.debug(f"Updating last downloaded time for {url}")
+
         # update the last downloaded time for the url
         file_url = FileURL.get_or_none(FileURL.url == url)
 

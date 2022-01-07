@@ -80,8 +80,8 @@ cache = Cache(flask_app)
 # order matters, files depends on persistent storage
 import app.storage.sql
 
-if flask_app.config.DATABASE_DRIVER == "sqlite":
-    if flask_app.config.DATABASE_FILENAME == ":memory:":
+if flask_app.config.DATABASE_DRIVER.lower() == "sqlite":
+    if flask_app.config.DATABASE_FILENAME.lower() == ":memory:":
         _database = pw.SqliteDatabase(flask_app.config.DATABASE_FILENAME)
     else:
         _sqlite_path = os.path.join(
@@ -89,7 +89,7 @@ if flask_app.config.DATABASE_DRIVER == "sqlite":
         )
         os.makedirs(os.path.dirname(_sqlite_path), exist_ok=True)
         _database = pw.SqliteDatabase(_sqlite_path)
-elif flask_app.config.DATABASE_DRIVER == "postgres":
+elif flask_app.config.DATABASE_DRIVER.lower() == "postgres":
     _database = pw.PostgresqlDatabase(
         flask_app.config.DATABASE_NAME,
         user=flask_app.config.DATABASE_USER,
@@ -97,7 +97,7 @@ elif flask_app.config.DATABASE_DRIVER == "postgres":
         host=flask_app.config.DATABASE_HOST,
         port=flask_app.config.DATABASE_PORT,
     )
-elif flask_app.config.DATABASE_DRIVER == "mysql":
+elif flask_app.config.DATABASE_DRIVER.lower() == "mysql":
     _database = pw.MySQLDatabase(
         flask_app.config.DATABASE_NAME,
         user=flask_app.config.DATABASE_USER,
@@ -111,7 +111,7 @@ else:
 storage_backend = app.storage.sql.SQLStorage(_database)
 
 # setup file storage
-if flask_app.config.FILE_STORAGE_DRIVER == "local":
+if flask_app.config.FILE_STORAGE_DRIVER.lower() == "local":
     import app.files.local
 
     file_backend = app.files.local.LocalFiles(
@@ -120,7 +120,7 @@ if flask_app.config.FILE_STORAGE_DRIVER == "local":
             flask_app.config.FILE_STORAGE_DIRECTORY,
         )
     )
-elif flask_app.config.FILE_STORAGE_DRIVER == "s3":
+elif flask_app.config.FILE_STORAGE_DRIVER.lower() == "s3":
     import app.files.s3
 
     file_backend = app.files.s3.S3Files(
@@ -164,12 +164,14 @@ def _log_request(response: Response):
     logger.info(f"{request.method} {request.full_path} {response.status_code}")
     return response
 
+
 @flask_app.before_request
 def _db_connect():
     """
     Before each request, connect to the database.
     """
     _database.connect(reuse_if_open=True)
+
 
 @flask_app.teardown_request
 def _db_close(exc):
