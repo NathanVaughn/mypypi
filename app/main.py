@@ -153,6 +153,15 @@ flask_app.register_blueprint(files_bp)
 
 
 @flask_app.after_request
-def log_request(response: Response):
+def _log_request(response: Response):
     logger.info(f"{request.method} {request.full_path} {response.status_code}")
     return response
+
+@flask_app.before_request
+def _db_connect():
+    _database.connect()
+
+@flask_app.teardown_request
+def _db_close(exc):
+    if not _database.is_closed():
+        _database.close()

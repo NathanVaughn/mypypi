@@ -29,7 +29,7 @@ class BaseFiles(abc.ABC):
         """
         Download a remote file and return a generator of bytes.
         """
-        logger.debug(f"Downloading file: {file_url}")
+        logger.info(f"Downloading file: {file_url}")
         response = requests.get(file_url, stream=True)
         yield from response.iter_content(chunk_size=1024)
 
@@ -38,7 +38,7 @@ class BaseFiles(abc.ABC):
         Given a remote file url, return a flask response.
         Will download the file if it does not exist.
         """
-        logger.debug(f"Getting file: {file_url}")
+        logger.info(f"Getting file: {file_url}")
         if not self.check(file_url):
             self.save(file_url)
 

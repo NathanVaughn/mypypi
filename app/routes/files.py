@@ -14,7 +14,7 @@ def proxy(hash_: str, filename: str) -> flask.Response:
     url = storage_backend.get_file_url_from_hash(hash_)
 
     if url is None:
-        logger.debug(f"URL hash {hash_} not found in database")
+        logger.info(f"URL hash {hash_} not found in database")
         return flask.abort(HTTPStatus.BAD_REQUEST)  # type: ignore
 
     # get the file

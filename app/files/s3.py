@@ -36,12 +36,12 @@ class S3Files(BaseFiles):
         file_path = self.build_path(file_url)
         result = self.fs.exists(file_path)
 
-        logger.debug(f"Checking if file {file_path} exists: {result}")
+        logger.info(f"Checking if file {file_path} exists: {result}")
         return result
 
     def save(self, file_url: str) -> str:
         file_path = self.build_path(file_url)
-        logger.debug(f"Uploading {file_url} to {file_path}")
+        logger.info(f"Uploading {file_url} to {file_path}")
 
         with self.fs.open(file_path, "wb") as f:
             for chunk in self.download(file_url):
@@ -53,10 +53,10 @@ class S3Files(BaseFiles):
         file_path = self.build_path(file_url)
         return_url = self.fs.url(file_path, expires=10 * 60)
 
-        logger.debug(f"Retrieving redirect url for {file_url} to {return_url}")
+        logger.info(f"Retrieving redirect url for {file_url} to {return_url}")
         return flask.redirect(return_url)  # type: ignore
 
     def delete(self, file_url: str) -> None:
         file_path = self.build_path(file_url)
-        logger.debug(f"Deleting file {file_path}")
+        logger.info(f"Deleting file {file_path}")
         self.fs.remove(file_path)

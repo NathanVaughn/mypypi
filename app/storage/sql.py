@@ -2,6 +2,7 @@ import datetime
 from typing import List, Optional, Tuple
 
 import peewee as pw
+from loguru import logger
 
 import app.libraries.hash
 from app.storage.base import BaseStorage
@@ -49,14 +50,23 @@ class SQLStorage(BaseStorage):
 
     def _get_url_cache_obj(self, url: str) -> Optional[URLCache]:
         # get a URLCache object
-        return URLCache.get_or_none(URLCache.url == url)
+        logger.debug(f"Getting URL Cache object for {url}")
+        result = URLCache.get_or_none(URLCache.url == url)
+        logger.debug(f"Result: {result}")
+
+        return result
 
     def get_url_cache(self, url: str) -> Optional[Tuple[int, bytes, str]]:
         # get URLCache properties, or return None
+        logger.debug(f"Getting url cache for {url}")
+
         url_cache = self._get_url_cache_obj(url)
 
         if url_cache is None:
+            logger.debug(f"No url cache found for {url}")
             return None
+
+        logger.debug(f"Url cache found for {url}")
 
         # get the blobs
         chunks = BlobChunk.select().where(BlobChunk.key == url).order_by(BlobChunk.order)  # type: ignore
@@ -66,9 +76,12 @@ class SQLStorage(BaseStorage):
 
     def del_url_cache(self, url: str) -> None:
         # delete an existing url cache
+        logger.debug(f"Deleting url cache for {url}")
+
         url_cache = self._get_url_cache_obj(url)
 
         if url_cache is not None:
+            logger.debug(f"Url cache found for {url}, deleting")
             url_cache.delete_instance()
 
         # delete the blobs
@@ -77,8 +90,11 @@ class SQLStorage(BaseStorage):
     def set_url_cache(
         self, url: str, status_code: int, content: bytes, headers: str
     ) -> None:
+        logger.debug(f"Setting url cache for {url}")
+
         # delete url cache if it already exists
-        if self.get_url_cache(url) is None:
+        if self.get_url_cache(url) is not None:
+            logger.debug(f"Deleteing existing url cache for {url}")
             self.del_url_cache(url)
 
         URLCache.create(
@@ -101,14 +117,21 @@ class SQLStorage(BaseStorage):
         with db.atomic():
             BlobChunk.bulk_create(chunks, batch_size=100)
 
+        logger.debug(f"Url cache for {url} set")
+
     def is_url_cache_valid(self, url: str, max_age: int) -> bool:
+        logger.debug(f"Checking if url cache for {url} is valid")
+
         # check if a url cache is still valid
         url_cache = self._get_url_cache_obj(url)
 
         if url_cache is None:
             return False
 
-        return (pw.datetime.datetime.now() - url_cache.time_created).total_seconds() < max_age  # type: ignore
+        result = (pw.datetime.datetime.now() - url_cache.time_created).total_seconds() < max_age  # type: ignore
+        logger.debug(f"Result: {result}")
+
+        return result
 
     # ================================================================
     # File URL

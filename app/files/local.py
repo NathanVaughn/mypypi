@@ -20,14 +20,14 @@ class LocalFiles(BaseFiles):
         file_path = self.build_path(file_url)
         result = os.path.exists(file_path)
 
-        logger.debug(f"Checking if file {file_path} exists: {result}")
+        logger.info(f"Checking if file {file_path} exists: {result}")
         return result
 
     def save(self, file_url: str) -> str:
         # build path to save file to
         file_path = self.build_path(file_url)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        logger.debug(f"Saving {file_url} to {file_path}")
+        logger.info(f"Saving {file_url} to {file_path}")
 
         # save the file
         with open(file_path, "wb") as f:
@@ -39,7 +39,7 @@ class LocalFiles(BaseFiles):
     def retrieve(self, file_url: str) -> flask.Response:
         # make response to send the file
         file_path = self.build_path(file_url)
-        logger.debug(f"Generating response URL for {file_path}")
+        logger.info(f"Generating response URL for {file_path}")
 
         return flask.send_from_directory(
             os.path.dirname(file_path), os.path.basename(file_path)
@@ -47,5 +47,5 @@ class LocalFiles(BaseFiles):
 
     def delete(self, file_url: str) -> None:
         file_path = self.build_path(file_url)
-        logger.debug(f"Deleting file {file_path}")
+        logger.info(f"Deleting file {file_path}")
         os.remove(file_path)

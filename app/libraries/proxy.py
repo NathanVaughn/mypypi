@@ -16,7 +16,7 @@ def use_cache(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     Loads the URL from cache and returns the
     status code, response content, and applicable headers
     """
-    logger.debug(f"Using cache for {url}")
+    logger.info(f"Using cache for {url}")
 
     result = storage_backend.get_url_cache(url)
     assert result is not None
@@ -36,7 +36,7 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
         return use_cache(url)
 
     # make request to upstream
-    logger.debug(f"Proxying request to {url}")
+    logger.info(f"Proxying request to {url}")
 
     # if request fails, use cache
     try:
@@ -68,7 +68,7 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     ]
 
     # insert new item into cache
-    logger.debug(f"Inserting {url} into cache")
+    logger.info(f"Inserting {url} into cache")
     storage_backend.set_url_cache(
         url, resp.status_code, resp.content, json.dumps(headers)
     )
