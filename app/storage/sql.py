@@ -66,9 +66,8 @@ class SQLStorage(BaseStorage):
             logger.debug(f"No url cache found for {url}")
             return None
 
-        logger.debug(f"Url cache found for {url}")
-
         # get the blobs
+        logger.debug(f"Reconstructing blobs for {url}")
         chunks = BlobChunk.select().where(BlobChunk.key == url).order_by(BlobChunk.order)  # type: ignore
         content = b"".join([chunk.content for chunk in chunks])
 
@@ -85,6 +84,7 @@ class SQLStorage(BaseStorage):
             url_cache.delete_instance()
 
         # delete the blobs
+        logger.debug(f"Deleting blobs for {url}")
         BlobChunk.delete().where(BlobChunk.key == url).execute()  # type: ignore
 
     def set_url_cache(

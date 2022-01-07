@@ -38,6 +38,9 @@ if "FILE_STORAGE_DRIVER" not in flask_app.config:
 if "FILE_STORAGE_DIRECTORY" not in flask_app.config:
     flask_app.config["FILE_STORAGE_DIRECTORY"] = "files"
 
+if "S3_PUBLIC" not in flask_app.config:
+    flask_app.config["S3_PUBLIC"] = False
+
 # persistent storage
 if "DATABASE_DRIVER" not in flask_app.config:
     flask_app.config["DATABASE_DRIVER"] = "sqlite"
@@ -126,6 +129,7 @@ elif flask_app.config.FILE_STORAGE_DRIVER == "s3":
         flask_app.config.S3_SECRET_KEY,
         endpoint_url=flask_app.config.get("S3_ENDPOINT_URL", None),
         region_name=flask_app.config.get("S3_REGION", None),
+        public=flask_app.config.S3_PUBLIC,
     )
 else:
     raise ValueError(
@@ -154,14 +158,23 @@ flask_app.register_blueprint(files_bp)
 
 @flask_app.after_request
 def _log_request(response: Response):
+    """
+    After each request, log the path and response code.
+    """
     logger.info(f"{request.method} {request.full_path} {response.status_code}")
     return response
 
 @flask_app.before_request
 def _db_connect():
-    _database.connect()
+    """
+    Before each request, connect to the database.
+    """
+    _database.connect(reuse_if_open=True)
 
 @flask_app.teardown_request
 def _db_close(exc):
+    """
+    After each request (no matter what), close the connection to the database.
+    """
     if not _database.is_closed():
         _database.close()
