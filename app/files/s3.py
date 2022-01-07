@@ -61,8 +61,7 @@ class S3Files(BaseFiles):
             # remove the query parameters from the url, so pip
             # can cache it better
             return_url_parsed = urllib.parse.urlparse(return_url)
-            return_url_parsed._replace(query="")
-            return_url = return_url_parsed.geturl()
+            return_url = return_url_parsed._replace(query="").geturl()
 
         logger.info(f"Retrieving redirect url for {file_url} to {return_url}")
         return flask.redirect(return_url)  # type: ignore
