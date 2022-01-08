@@ -110,5 +110,8 @@ def proxy_urls(urls: List[str]) -> List[str]:
     # more efficient than one at a time
     hashes = storage_backend.get_or_create_file_url_hashes(urls)
 
+    # for url, hash_ in zip(urls, hashes):
+    #     assert sha256_string(url) == hash_
+
     # now go through normal proxy_url function
     return [generate_proxy_file_url(url, hash_) for url, hash_ in zip(urls, hashes)]

@@ -53,3 +53,21 @@ class BaseStorage(abc.ABC):
         Delete all urls that were downloaded more than days ago.
         """
         raise NotImplementedError
+
+    def check_url_task(self, url: str) -> bool:
+        """
+        Return if a task for the given url exists
+        """
+        raise NotImplementedError
+
+    def add_url_task(self, url: str) -> None:
+        """
+        Add a task record for the url.
+        """
+        raise NotImplementedError
+
+    def del_url_task(self, url: str) -> None:
+        """
+        Delete the task record for the url.
+        """
+        raise NotImplementedError

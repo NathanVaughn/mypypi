@@ -1,9 +1,11 @@
 import abc
+import multiprocessing
 import os
-from typing import Generator
+from typing import Generator, Union
 
 import flask
 import requests
+import werkzeug
 from loguru import logger
 
 import app.libraries.hash
@@ -33,18 +35,42 @@ class BaseFiles(abc.ABC):
         response = requests.get(file_url, stream=True)
         yield from response.iter_content(chunk_size=1024)
 
-    def get(self, file_url: str) -> flask.Response:
+    def in_progress(self, file_url: str) -> bool:
+        """
+        Check if there is already a task in-progress to download/upload this file url.
+        """
+        return storage_backend.check_url_task(file_url)
+
+    def get(self, file_url: str) -> Union[flask.Response, werkzeug.wrappers.Response]:
         """
         Given a remote file url, return a flask response.
         Will download the file if it does not exist.
         """
         logger.info(f"Getting file: {file_url}")
         if not self.check(file_url):
-            self.save(file_url)
+            # if a task not in progress
+            if not self.in_progress(file_url):
+                # download the file in a background thread
+                process = multiprocessing.Process(
+                    target=self.save_wrapper, args=(file_url,)
+                )
+                process.start()
+
+            # redirect to original url
+            storage_backend.update_file_url_last_downloaded_time(file_url)
+            logger.debug(f"Redirecting to {file_url}")
+            return flask.redirect(file_url)
 
         storage_backend.update_file_url_last_downloaded_time(file_url)
-
         return self.retrieve(file_url)
+
+    def save_wrapper(self, file_url: str) -> None:
+        """
+        Wrapper around `save`.
+        """
+        storage_backend.add_url_task(file_url)
+        self.save(file_url)
+        storage_backend.del_url_task(file_url)
 
     def check(self, file_url: str) -> bool:
         """

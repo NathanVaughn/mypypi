@@ -1,6 +1,8 @@
 from http import HTTPStatus
+from typing import Union
 
 import flask
+import werkzeug
 from loguru import logger
 
 from app.main import file_backend, storage_backend
@@ -9,7 +11,9 @@ files_bp = flask.Blueprint("files", __name__, url_prefix="/file")
 
 
 @files_bp.route("/<string:hash_>/<string:filename>")
-def proxy(hash_: str, filename: str) -> flask.Response:
+def proxy(
+    hash_: str, filename: str
+) -> Union[flask.Response, werkzeug.wrappers.Response]:
     # validate hash
     logger.debug(f"Validating URL hash {hash_}")
     url = storage_backend.get_file_url_from_hash(hash_)

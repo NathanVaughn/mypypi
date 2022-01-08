@@ -39,10 +39,15 @@ class FileURL(BaseModel):
     time_last_downloaded = pw.DateTimeField(null=True)
 
 
+# table to hold in-progress downloads
+class URLTask(BaseModel):
+    url = pw.TextField(unique=True)
+
+
 class SQLStorage(BaseStorage):
     def __init__(self, database: pw.Database) -> None:
         db.initialize(database)
-        db.create_tables([BlobChunk, URLCache, FileURL])
+        db.create_tables([BlobChunk, URLCache, FileURL, URLTask])
 
     # ================================================================
     # URL Cache
@@ -94,7 +99,7 @@ class SQLStorage(BaseStorage):
 
         # delete url cache if it already exists
         if self._get_url_cache_obj(url) is not None:
-            logger.debug(f"Deleteing existing url cache for {url}")
+            logger.debug(f"Deleting existing url cache for {url}")
             self.del_url_cache(url)
 
         URLCache.create(
@@ -168,8 +173,7 @@ class SQLStorage(BaseStorage):
             FileURL.bulk_create(new_file_urls, batch_size=100)
 
         # now, get the hashes for all the urls
-        file_url_objs: List[FileURL] = FileURL.select(FileURL.hash_).where(FileURL.url.in_(urls)).execute()  # type: ignore
-        return [str(url.hash_) for url in file_url_objs]
+        return [app.libraries.hash.sha256_string(url) for url in urls]
 
     def update_file_url_last_downloaded_time(self, url: str) -> None:
         logger.debug(f"Updating last downloaded time for {url}")
@@ -180,6 +184,28 @@ class SQLStorage(BaseStorage):
         if file_url is not None:
             file_url.time_last_downloaded = datetime.datetime.now()
             file_url.save()
+
+    # ================================================================
+    # Downloads
+    # ================================================================
+
+    def check_url_task(self, url: str) -> bool:
+        # get a download task
+        logger.debug(f"Checking if task for {url} exists")
+        result = bool(URLTask.get_or_none(URLTask.url == url))
+        logger.debug(f"Result: {result}")
+
+        return result
+
+    def add_url_task(self, url: str) -> None:
+        logger.debug(f"Creating task for {url}")
+        URLTask.create(url=url)
+
+    def del_url_task(self, url: str) -> None:
+        # delete a url task
+        logger.debug(f"Deleting task for {url}")
+        task = URLTask.get(URLTask.url == url)
+        task.delete_instance()
 
     # ================================================================
     # Prune
