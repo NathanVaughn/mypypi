@@ -17,4 +17,4 @@ COPY . .
 
 # run server
 EXPOSE 80
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "wsgi:flask_app"]
+ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:80", "wsgi:flask_app"]

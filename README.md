@@ -38,6 +38,9 @@ Additionally, you can set any of the settings from
 (you still need to add the `MYPYPI_` prefix to the setting name). By default,
 `SimpleCache` is used for `CACHE_TYPE`.
 
+If some very large packages are failing to download (such as `PySide6`), you can
+increase the timeout by adding `--timeout 60` to the container's command.
+
 ## Example Configs
 
 ### Simple
