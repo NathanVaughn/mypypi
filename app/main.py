@@ -27,6 +27,7 @@ if "CACHE_TYPE" not in flask_app.config:
 
 if "CACHE_DEFAULT_TIMEOUT" not in flask_app.config:
     flask_app.config["CACHE_DEFAULT_TIMEOUT"] = 30 * 60
+flask_app.config["CACHE_KEY_PREFIX"] = "mypypi_"
 
 # data
 if "DATA_DIRECTORY" not in flask_app.config:

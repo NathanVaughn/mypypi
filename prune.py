@@ -10,6 +10,7 @@ def main(days: int, dry_run: bool) -> None:
         print(f"{len(deleted)} files would have been deleted")
     else:
         print(f"{len(deleted)} files were deleted")
+        app.main.cache.clear()
 
 
 if __name__ == "__main__":

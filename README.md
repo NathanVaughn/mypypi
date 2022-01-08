@@ -78,3 +78,15 @@ MYPYPI_DATABASE_PASSWORD="<password>"
 MYPYPI_DATABASE_HOST="<host>"
 MYPYPI_DATABASE_PORT=3306
 ```
+
+## Maintenance
+
+If you want to delete some old files that are taking up space, you can run
+
+```bash
+python prune.py <days> --dry-run
+```
+
+inside the container. This will tell you how many files have not been deleted
+for X number of days, and will be deleted once you remove `--dry-run`. Remove the
+`--dry-run` flag to execute.
