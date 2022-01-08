@@ -210,13 +210,17 @@ class SQLStorage(BaseStorage):
     # ================================================================
     # Prune
     # ================================================================
-    def delete_older_than_days(self, days: int) -> None:
+    def delete_older_than_days(self, days: int, dry_run: bool = False) -> List[str]:
         # this is imported here to avoid circular imports
         # very infrequently used, so not too big of a deal
         from app.main import file_backend  # noqa
 
         file_urls: List[FileURL] = FileURL.select().where(FileURL.time_last_downloaded < datetime.datetime.now() - datetime.timedelta(days=days))  # type: ignore
+        file_urls_urls = [str(file_url.url) for file_url in file_urls]
 
-        for file_url in file_urls:
-            file_backend.delete(str(file_url.url))
-            file_url.delete_instance()
+        if not dry_run:
+            for file_url in file_urls:
+                file_backend.delete(str(file_url.url))
+                file_url.delete_instance()
+
+        return file_urls_urls
