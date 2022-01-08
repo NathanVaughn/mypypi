@@ -1,6 +1,6 @@
 import abc
-import multiprocessing
 import os
+import threading
 from typing import Generator, Union
 
 import flask
@@ -51,7 +51,7 @@ class BaseFiles(abc.ABC):
             # if a task not in progress
             if not self.in_progress(file_url):
                 # download the file in a background thread
-                process = multiprocessing.Process(
+                process = threading.Thread(
                     target=self.save_wrapper, args=(file_url,)
                 )
                 process.start()
