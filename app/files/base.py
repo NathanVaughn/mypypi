@@ -1,6 +1,7 @@
 import abc
 import os
 import threading
+from http import HTTPStatus
 from typing import Generator, Union
 
 import flask
@@ -10,7 +11,7 @@ from loguru import logger
 
 import app.libraries.hash
 import app.libraries.url
-from app.main import storage_backend
+from app.main import flask_app, storage_backend
 
 
 class BaseFiles(abc.ABC):
@@ -51,10 +52,12 @@ class BaseFiles(abc.ABC):
             # if a task not in progress
             if not self.in_progress(file_url):
                 # download the file in a background thread
-                process = threading.Thread(
-                    target=self.save_wrapper, args=(file_url,)
-                )
+                process = threading.Thread(target=self.save_wrapper, args=(file_url,))
                 process.start()
+
+            # if strict about not sending to upstream
+            if flask_app.config.UPSTREAM_STRICT:
+                return flask.abort(HTTPStatus.SERVICE_UNAVAILABLE)
 
             # redirect to original url
             storage_backend.update_file_url_last_downloaded_time(file_url)

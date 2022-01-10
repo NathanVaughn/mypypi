@@ -21,6 +21,9 @@ if "UPSTREAM_URL" not in flask_app.config:
     flask_app.config["UPSTREAM_URL"] = "https://pypi.org"
 flask_app.config["UPSTREAM_URL"] = flask_app.config.UPSTREAM_URL.rstrip("/")
 
+if "UPSTREAM_STRICT" not in flask_app.config:
+    flask_app.config["UPSTREAM_STRICT"] = False
+
 # caching
 if "CACHE_TYPE" not in flask_app.config:
     flask_app.config["CACHE_TYPE"] = "SimpleCache"

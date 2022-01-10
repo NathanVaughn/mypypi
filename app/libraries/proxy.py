@@ -5,10 +5,11 @@ from urllib.parse import urlparse
 
 import flask
 import requests
+import requests.auth
 from loguru import logger
 
 from app.libraries.url import get_filename
-from app.main import storage_backend
+from app.main import flask_app, storage_backend
 
 
 def use_url_cache(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
@@ -40,7 +41,16 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     # if request fails, use cache
     try:
         # make request to upstream
-        resp = requests.get(url)
+        kwargs = {}
+        if (
+            "UPSTREAM_USERNAME" in flask_app.config
+            and "UPSTREAM_PASSWORD" in flask_app.config
+        ):
+            kwargs["auth"] = requests.auth.HTTPBasicAuth(
+                flask_app.config.UPSTREAM_USERNAME,
+                flask_app.config.UPSTREAM_PASSWORD,
+            )
+        resp = requests.get(url, **kwargs)
     except requests.exceptions.RequestException as e:
         logger.error(e)
         return use_url_cache(url)
