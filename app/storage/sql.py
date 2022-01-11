@@ -37,6 +37,7 @@ class FileURL(BaseModel):
     url = pw.TextField(unique=True)
     hash_ = pw.TextField(unique=True)
     time_last_downloaded = pw.DateTimeField(null=True)
+    download_count = pw.IntegerField(default=0)
 
 
 # table to hold in-progress downloads
@@ -182,6 +183,7 @@ class SQLStorage(BaseStorage):
         file_url = FileURL.get_or_none(FileURL.url == url)
 
         if file_url is not None:
+            file_url.download_count += 1
             file_url.time_last_downloaded = datetime.datetime.now()
             file_url.save()
 

@@ -50,7 +50,7 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
                 flask_app.config.UPSTREAM_USERNAME,
                 flask_app.config.UPSTREAM_PASSWORD,
             )
-        resp = requests.get(url, **kwargs)
+        resp = requests.get(url, headers={"User-Agent": "mypypi 1.0"}, **kwargs)
     except requests.exceptions.RequestException as e:
         logger.error(e)
         return use_url_cache(url)
