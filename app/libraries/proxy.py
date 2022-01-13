@@ -89,6 +89,7 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
 def generate_proxy_file_url(url: str, hash_: str) -> str:
     """
     Given a file url and hash, return the proxy url.
+    The file should already be recorded in the database.
     """
     # need to extract the url fragement, as it contains the hash
     parsed = urlparse(url)

@@ -9,6 +9,7 @@ from app.main import cache
 
 url_prefix = "pypi"
 url_postfix = "json"
+
 json_bp = flask.Blueprint("json", __name__, url_prefix=f"/{url_prefix}")
 
 
@@ -53,13 +54,13 @@ def process_json(json_data: bytes) -> str:
     return json.dumps(data, indent=4)
 
 
-@json_bp.route("/<string:projectname>/json")
+@json_bp.route(f"/<string:projectname>/{url_postfix}")
 @cache.cached()
 def project(projectname: str) -> flask.Response:
     # make request to upstream
     logger.debug(f"Getting upstream JSON for {projectname}")
     status_code, content, headers = app.libraries.proxy.reverse_proxy(
-        f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{url_postfix}"
+        f"{flask.current_app.config.UPSTREAM_PYPI_URL}/{url_prefix}/{projectname}/{url_postfix}"
     )
     if status_code != http.HTTPStatus.OK:
         return flask.Response(content, status_code, headers)
@@ -72,13 +73,13 @@ def project(projectname: str) -> flask.Response:
     return flask.Response(new_json, status_code, headers)
 
 
-@json_bp.route("/<string:projectname>/<string:version>/json")
+@json_bp.route(f"/<string:projectname>/<string:version>/{url_postfix}")
 @cache.cached()
 def project_version(projectname: str, version: str) -> flask.Response:
     # make request to upstream
     logger.debug(f"Getting upstream JSON for {projectname}/{version}")
     status_code, content, headers = app.libraries.proxy.reverse_proxy(
-        f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{version}/{url_postfix}"
+        f"{flask.current_app.config.UPSTREAM_PYPI_URL}/{url_prefix}/{projectname}/{version}/{url_postfix}"
     )
 
     if status_code != http.HTTPStatus.OK:

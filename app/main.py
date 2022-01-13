@@ -1,11 +1,14 @@
 import os
+import flask
 
 import peewee as pw
+from playhouse import sqliteq
 from dynaconf import FlaskDynaconf
 from flask import Flask, request
 from flask.wrappers import Response
 from flask_caching import Cache
 from loguru import logger
+
 
 flask_app = Flask(__name__)
 FlaskDynaconf(flask_app, ENVVAR_PREFIX="MYPYPI")
@@ -17,9 +20,14 @@ FlaskDynaconf(flask_app, ENVVAR_PREFIX="MYPYPI")
 # dictionary syntax needs to be used so the updated settings copy correctly
 
 # config upstream
-if "UPSTREAM_URL" not in flask_app.config:
-    flask_app.config["UPSTREAM_URL"] = "https://pypi.org"
-flask_app.config["UPSTREAM_URL"] = flask_app.config.UPSTREAM_URL.rstrip("/")
+if "UPSTREAM_PYPI_URL" not in flask_app.config:
+    flask_app.config["UPSTREAM_PYPI_URL"] = "https://pypi.org"
+flask_app.config["UPSTREAM_PYPI_URL"] = flask_app.config.UPSTREAM_PYPI_URL.rstrip("/")
+
+if "UPSTREAM_NPM_URL" not in flask_app.config:
+    flask_app.config["UPSTREAM_NPM_URL"] = "https://registry.npmjs.org"
+flask_app.config["UPSTREAM_NPM_URL"] = flask_app.config.UPSTREAM_NPM_URL.rstrip("/")
+
 
 if "UPSTREAM_STRICT" not in flask_app.config:
     flask_app.config["UPSTREAM_STRICT"] = False
@@ -92,7 +100,7 @@ if flask_app.config.DATABASE_DRIVER.lower() == "sqlite":
             flask_app.config.DATA_DIRECTORY, flask_app.config.DATABASE_FILENAME
         )
         os.makedirs(os.path.dirname(_sqlite_path), exist_ok=True)
-        _database = pw.SqliteDatabase(_sqlite_path)
+        _database = sqliteq.SqliteQueueDatabase(_sqlite_path)
 elif flask_app.config.DATABASE_DRIVER.lower() == "postgres":
     _database = pw.PostgresqlDatabase(
         flask_app.config.DATABASE_NAME,
@@ -145,15 +153,17 @@ else:
 # =============================================================================
 
 from app.routes.files import files_bp
-from app.routes.json import json_bp
-from app.routes.simple import simple_bp
+from app.routes.npm import npm_bp
+from app.routes.pypi import pypi_bp
 
-# pypi routes
-flask_app.register_blueprint(simple_bp)
-flask_app.register_blueprint(json_bp)
+# package routes
+flask_app.register_blueprint(pypi_bp)
+flask_app.register_blueprint(npm_bp)
 
 # our internal routes
 flask_app.register_blueprint(files_bp)
+
+print(flask_app.url_map)
 
 # =============================================================================
 # Hooks

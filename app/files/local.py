@@ -42,7 +42,7 @@ class LocalFiles(BaseFiles):
         logger.info(f"Generating response URL for {file_path}")
 
         return flask.send_from_directory(
-            os.path.dirname(file_path), os.path.basename(file_path)
+            os.path.dirname(file_path), os.path.basename(file_path), use_x_sendfile=True
         )
 
     def delete(self, file_url: str) -> None:
