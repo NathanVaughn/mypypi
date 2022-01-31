@@ -11,7 +11,7 @@
     Flask           = "^2.0.2"
     Flask-Caching   = "^1.10.1"    # additional layer of caching
     requests        = "^2.26.0"    # HTTP requests
-    loguru          = "^0.5.3"     # logging
+    loguru          = "^0.6.0"     # logging
     beautifulsoup4  = "^4.10.0"    # HTML parsing
     dynaconf        = "^3.1.7"     # config
     s3fs            = "^2022.1.0" # S3
