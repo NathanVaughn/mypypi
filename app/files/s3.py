@@ -37,7 +37,7 @@ class S3Files(BaseFiles):
     def build_path(self, file_url: str) -> str:
         path = super().build_path(file_url).replace("\\", "/")
         if self.prefix:
-            path = f"{self.prefix}/{path}"
+            path = f"{self.prefix.rstrip('/')}/{path}"
 
         return f"{self.bucket}/{path}"
 
