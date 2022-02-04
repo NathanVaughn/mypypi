@@ -134,6 +134,7 @@ elif flask_app.config.FILE_STORAGE_DRIVER.lower() == "s3":
         endpoint_url=flask_app.config.get("S3_ENDPOINT_URL", None),
         region_name=flask_app.config.get("S3_REGION", None),
         public=flask_app.config.S3_PUBLIC,
+        prefix=flask_app.config.get("S3_PREFIX", None),
     )
 else:
     raise ValueError(

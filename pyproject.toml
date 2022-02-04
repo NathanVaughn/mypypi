@@ -1,6 +1,6 @@
 [tool.poetry]
     name        = "mypypi"
-    version     = "1.0.13"
+    version     = "1.0.14"
     description = "PyPi pull-through cache"
     authors     = ["Nathan Vaughn <nvaughn51@gmail.com>"]
     readme      = "README.md"

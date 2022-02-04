@@ -17,6 +17,7 @@ class S3Files(BaseFiles):
         endpoint_url: Optional[str] = None,
         region_name: Optional[str] = None,
         public: bool = False,
+        prefix: Optional[str] = None,
     ) -> None:
         self.bucket = bucket
 
@@ -31,9 +32,13 @@ class S3Files(BaseFiles):
         )
 
         self._is_public = public
+        self.prefix = prefix
 
     def build_path(self, file_url: str) -> str:
         path = super().build_path(file_url).replace("\\", "/")
+        if self.prefix:
+            path = f"{self.prefix}/{path}"
+
         return f"{self.bucket}/{path}"
 
     def check(self, file_url: str) -> bool:
