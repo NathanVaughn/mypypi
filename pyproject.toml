@@ -18,7 +18,7 @@
     peewee          = "^3.14.8"    # SQL
     PyMySQL         = "^1.0.2"     # MySQL
     psycopg2-binary = "^2.9.3"     # PostgreSQL
-    redis           = "^4.1.2"     # Redis
+    redis           = "^4.1.3"     # Redis
 
 [tool.poetry.dev-dependencies]
     black     = "^22.1"
