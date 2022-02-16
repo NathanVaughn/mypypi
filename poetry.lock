@@ -389,7 +389,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 
 [[package]]
 name = "peewee"
-version = "3.14.8"
+version = "3.14.9"
 description = "a little orm"
 category = "main"
 optional = false
@@ -610,7 +610,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "33bdcc2f0cee9b0778f555d7386bc45fec4c27edcac01aa2190b2a7eabb301ef"
+content-hash = "51bd9121f442903bc98fd881b9ae3a66adc7fb1556a0fd359e33b18faadee18b"
 
 [metadata.files]
 aiobotocore = [
@@ -1008,7 +1008,7 @@ pathspec = [
     {file = "pathspec-0.9.0.tar.gz", hash = "sha256:e564499435a2673d586f6b2130bb5b95f04a3ba06f81b8f895b651a3c76aabb1"},
 ]
 peewee = [
-    {file = "peewee-3.14.8.tar.gz", hash = "sha256:01bd7f734defb08d7a3346a0c0ca7011bc8d0d685934ec0e001b3371d522ec53"},
+    {file = "peewee-3.14.9.tar.gz", hash = "sha256:69c1b88dc89b184231cc1ce6df241075aca5cec43e89749cc4a63108f9ceea47"},
 ]
 platformdirs = [
     {file = "platformdirs-2.4.1-py3-none-any.whl", hash = "sha256:1d7385c7db91728b83efd0ca99a5afb296cab9d0ed8313a45ed8ba17967ecfca"},
