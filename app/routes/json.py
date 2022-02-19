@@ -25,8 +25,7 @@ def process_json(json_data: bytes) -> str:
     # make a list of all url objects that need updating
     url_objects = []
     for release in releases:
-        for url_obj in releases[release]:
-            url_objects.append(url_obj)
+        url_objects.extend(iter(releases[release]))
 
     # generate all the proxy urls
     proxy_urls = app.libraries.proxy.proxy_urls([u["url"] for u in url_objects])
