@@ -54,5 +54,5 @@ jobs:
             docker.io/nathanvaughn/mypypi:${{ env.MYPYPI_VERSION }}
             ghcr.io/nathanvaughn/mypypi:latest
             ghcr.io/nathanvaughn/mypypi:${{ env.MYPYPI_VERSION }}
-            cr.nthnv.me/mypypi:latest
-            cr.nthnv.me/mypypi:${{ env.MYPYPI_VERSION }}
+            cr.nthnv.me/library/mypypi:latest
+            cr.nthnv.me/library/mypypi:${{ env.MYPYPI_VERSION }}
