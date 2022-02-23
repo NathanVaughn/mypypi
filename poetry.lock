@@ -19,7 +19,7 @@ boto3 = ["boto3 (>=1.20.24,<1.20.25)"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "aiohttp"
@@ -44,7 +44,7 @@ speedups = ["aiodns", "brotli", "cchardet"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "aioitertools"
@@ -60,7 +60,7 @@ typing_extensions = {version = ">=4.0", markers = "python_version < \"3.10\""}
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "aiosignal"
@@ -76,7 +76,7 @@ frozenlist = ">=1.1.0"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "async-timeout"
@@ -89,7 +89,7 @@ python-versions = ">=3.6"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "attrs"
@@ -108,7 +108,7 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "autoflake"
@@ -124,7 +124,7 @@ pyflakes = ">=1.1.0"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "beautifulsoup4"
@@ -144,7 +144,7 @@ lxml = ["lxml"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "black"
@@ -171,7 +171,7 @@ uvloop = ["uvloop (>=0.15.2)"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "botocore"
@@ -192,7 +192,7 @@ crt = ["awscrt (==0.12.5)"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "certifi"
@@ -205,7 +205,7 @@ python-versions = "*"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "charset-normalizer"
@@ -221,7 +221,7 @@ unicode_backport = ["unicodedata2"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "click"
@@ -237,7 +237,7 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "colorama"
@@ -250,7 +250,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "deprecated"
@@ -269,7 +269,7 @@ dev = ["tox", "bump2version (<1)", "sphinx (<2)", "importlib-metadata (<3)", "im
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "dynaconf"
@@ -291,7 +291,7 @@ yaml = ["ruamel.yaml"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "flask"
@@ -314,7 +314,7 @@ dotenv = ["python-dotenv"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "flask-caching"
@@ -330,7 +330,7 @@ Flask = "*"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "frozenlist"
@@ -343,15 +343,15 @@ python-versions = ">=3.7"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "fsspec"
-version = "2022.1.0"
+version = "2022.2.0"
 description = "File-system specification"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.extras]
 abfs = ["adlfs"]
@@ -378,7 +378,7 @@ ssh = ["paramiko"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "idna"
@@ -391,7 +391,7 @@ python-versions = ">=3.5"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "isort"
@@ -410,7 +410,7 @@ plugins = ["setuptools"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "itsdangerous"
@@ -423,7 +423,7 @@ python-versions = ">=3.7"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "jinja2"
@@ -442,7 +442,7 @@ i18n = ["Babel (>=2.7)"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "jmespath"
@@ -455,7 +455,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "loguru"
@@ -475,7 +475,7 @@ dev = ["colorama (>=0.3.4)", "docutils (==0.16)", "flake8 (>=3.7.7)", "tox (>=3.
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "markupsafe"
@@ -488,7 +488,7 @@ python-versions = ">=3.7"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "multidict"
@@ -501,7 +501,7 @@ python-versions = ">=3.7"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "mypy-extensions"
@@ -514,7 +514,7 @@ python-versions = "*"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "packaging"
@@ -530,7 +530,7 @@ pyparsing = ">=2.0.2,<3.0.5 || >3.0.5"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "pathspec"
@@ -543,7 +543,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "peewee"
@@ -556,7 +556,7 @@ python-versions = "*"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "platformdirs"
@@ -573,7 +573,7 @@ test = ["appdirs (==1.4.4)", "pytest (>=6)", "pytest-cov (>=2.7)", "pytest-mock 
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "psycopg2-binary"
@@ -586,7 +586,7 @@ python-versions = ">=3.6"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "pyflakes"
@@ -599,7 +599,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "pyleft"
@@ -616,7 +616,7 @@ tomli = ">=1.1.0"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "pymysql"
@@ -633,7 +633,7 @@ rsa = ["cryptography"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "pyparsing"
@@ -649,7 +649,7 @@ diagrams = ["jinja2", "railroad-diagrams"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "python-dateutil"
@@ -665,7 +665,7 @@ six = ">=1.5"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "redis"
@@ -686,7 +686,7 @@ ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "requests"
@@ -709,20 +709,20 @@ use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "s3fs"
-version = "2022.1.0"
+version = "2022.2.0"
 description = "Convenient Filesystem interface over S3"
 category = "main"
 optional = false
-python-versions = ">= 3.6"
+python-versions = ">= 3.7"
 
 [package.dependencies]
 aiobotocore = ">=2.1.0,<2.2.0"
 aiohttp = "<=4"
-fsspec = "2022.01.0"
+fsspec = "2022.02.0"
 
 [package.extras]
 awscli = ["aiobotocore[awscli] (>=2.1.0,<2.2.0)"]
@@ -731,7 +731,7 @@ boto3 = ["aiobotocore[boto3] (>=2.1.0,<2.2.0)"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "six"
@@ -744,7 +744,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "soupsieve"
@@ -757,7 +757,7 @@ python-versions = ">=3.6"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "tomli"
@@ -770,7 +770,7 @@ python-versions = ">=3.7"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "typing-extensions"
@@ -783,7 +783,7 @@ python-versions = ">=3.6"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "urllib3"
@@ -801,7 +801,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "werkzeug"
@@ -817,7 +817,7 @@ watchdog = ["watchdog"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "win32-setctime"
@@ -833,7 +833,7 @@ dev = ["pytest (>=4.6.2)", "black (>=19.3b0)"]
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "wrapt"
@@ -846,7 +846,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [[package]]
 name = "yarl"
@@ -863,12 +863,12 @@ multidict = ">=4.0"
 [package.source]
 type = "legacy"
 url = "https://pypi.nthnv.me/simple"
-    reference = "mypypi"
+reference = "mypypi"
 
 [metadata]
 lock-version = "1.1"
-    python-versions = ">=3.8,<4.0"
-content-hash = "af0043afdbd3f6a7419edba48e0d61f961833cb886b31fce302147a35de6dc64"
+python-versions = ">=3.8,<4.0"
+content-hash = "67a5c886eea6999eecd937d5726c39bf052faf06f35e2204f6728f098808f930"
 
 [metadata.files]
 aiobotocore = [
@@ -1094,8 +1094,8 @@ frozenlist = [
     {file = "frozenlist-1.3.0.tar.gz", hash = "sha256:ce6f2ba0edb7b0c1d8976565298ad2deba6f8064d2bebb6ffce2ca896eb35b0b"},
 ]
 fsspec = [
-    {file = "fsspec-2022.1.0-py3-none-any.whl", hash = "sha256:256e2be44e62430c9ca8dac2e480384b00a3c52aef4e2b0b7204163fdc861d37"},
-    {file = "fsspec-2022.1.0.tar.gz", hash = "sha256:0bdd519bbf4d8c9a1d893a50b5ebacc89acd0e1fe0045d2f7b0e0c1af5990edc"},
+    {file = "fsspec-2022.2.0-py3-none-any.whl", hash = "sha256:eb9c9d9aee49d23028deefffe53e87c55d3515512c63f57e893710301001449a"},
+    {file = "fsspec-2022.2.0.tar.gz", hash = "sha256:20322c659538501f52f6caa73b08b2ff570b7e8ea30a86559721d090e473ad5c"},
 ]
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
@@ -1330,8 +1330,8 @@ requests = [
     {file = "requests-2.27.1.tar.gz", hash = "sha256:68d7c56fd5a8999887728ef304a6d12edc7be74f1cfa47714fc8b414525c9a61"},
 ]
 s3fs = [
-    {file = "s3fs-2022.1.0-py3-none-any.whl", hash = "sha256:3d20584130a6bf4679e4d9fa9a859597bab6553b8f4bd439168629c825d8ef01"},
-    {file = "s3fs-2022.1.0.tar.gz", hash = "sha256:6bafc1f6b4e935ea59512c0f38d5cb9c299dbbfe738e40c3d1de8f67b4ee1fd4"},
+    {file = "s3fs-2022.2.0-py3-none-any.whl", hash = "sha256:62cc021e4b192942cb51667a4b5299e948476f318838df7a693ed7a3628fcb8d"},
+    {file = "s3fs-2022.2.0.tar.gz", hash = "sha256:4611d0f7e41e5bc9dac3009070e0ad37da87a42f6def75b4813c06f7e404a738"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
