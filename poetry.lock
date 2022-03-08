@@ -547,7 +547,7 @@ reference = "mypypi"
 
 [[package]]
 name = "peewee"
-version = "3.14.9"
+version = "3.14.10"
 description = "a little orm"
 category = "main"
 optional = false
@@ -868,7 +868,7 @@ reference = "mypypi"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "67a5c886eea6999eecd937d5726c39bf052faf06f35e2204f6728f098808f930"
+content-hash = "995ddfc8f5980ecd5aa1e11fd0d36ae8f7a5d2dd2b8b1aa8d80f9714671acce8"
 
 [metadata.files]
 aiobotocore = [
@@ -1237,7 +1237,7 @@ pathspec = [
     {file = "pathspec-0.9.0.tar.gz", hash = "sha256:e564499435a2673d586f6b2130bb5b95f04a3ba06f81b8f895b651a3c76aabb1"},
 ]
 peewee = [
-    {file = "peewee-3.14.9.tar.gz", hash = "sha256:69c1b88dc89b184231cc1ce6df241075aca5cec43e89749cc4a63108f9ceea47"},
+    {file = "peewee-3.14.10.tar.gz", hash = "sha256:23271422b332c82d30c92597dee905ee831b56c6d99c33e05901e6891c75fe15"},
 ]
 platformdirs = [
     {file = "platformdirs-2.5.0-py3-none-any.whl", hash = "sha256:30671902352e97b1eafd74ade8e4a694782bd3471685e78c32d0fdfd3aa7e7bb"},
