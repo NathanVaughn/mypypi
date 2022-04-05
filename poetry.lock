@@ -692,7 +692,7 @@ reference = "mypypi"
 
 [[package]]
 name = "redis"
-version = "4.2.1"
+version = "4.2.2"
 description = "Python client for Redis database and key-value store"
 category = "main"
 optional = false
@@ -909,7 +909,7 @@ reference = "mypypi"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "6b72174029da019e5e27533f0d5ddf3d7984ffc18fb4855d86adc454b26a388a"
+content-hash = "9b1a85f39b3a9ddb87d193598bc39c21a0127fe5a5f0d1f977ccd64395ca3257"
 
 [metadata.files]
 aiobotocore = [
@@ -1367,8 +1367,8 @@ python-dateutil = [
     {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
 ]
 redis = [
-    {file = "redis-4.2.1-py3-none-any.whl", hash = "sha256:69d05fac17bf3f43937afbb775c536eb516bd21355a4f17d59a966f4a531ce71"},
-    {file = "redis-4.2.1.tar.gz", hash = "sha256:fe45513881229dbee610620b9e0817b1f48c47ba635870320fd44a712204bbdd"},
+    {file = "redis-4.2.2-py3-none-any.whl", hash = "sha256:4e95f4ec5f49e636efcf20061a5a9110c20852f607cfca6865c07aaa8a739ee2"},
+    {file = "redis-4.2.2.tar.gz", hash = "sha256:0107dc8e98a4f1d1d4aa00100e044287f77121a1e6d2085545c4b7fa94a7a27f"},
 ]
 requests = [
     {file = "requests-2.27.1-py2.py3-none-any.whl", hash = "sha256:f22fa1e554c9ddfd16e6e41ac79759e17be9e492b3587efa038054674760e72d"},
