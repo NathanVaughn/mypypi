@@ -627,7 +627,7 @@ reference = "mypypi"
 
 [[package]]
 name = "pyleft"
-version = "1.0.1"
+version = "1.0.2"
 description = "Python type annotation existence checker"
 category = "dev"
 optional = false
@@ -910,7 +910,7 @@ reference = "mypypi"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "a86128ba59358b709e3f73b83db93f42e8835ae009d78654d5868d40ebba4039"
+content-hash = "7c4bbb4f71d9242aa21bcf83242bd3ad3d30728d404bb659605ce8c46f2271e0"
 
 [metadata.files]
 aiobotocore = [
@@ -1352,8 +1352,8 @@ pyflakes = [
     {file = "pyflakes-2.4.0.tar.gz", hash = "sha256:05a85c2872edf37a4ed30b0cce2f6093e1d0581f8c19d7393122da7e25b2b24c"},
 ]
 pyleft = [
-    {file = "pyleft-1.0.1-py3-none-any.whl", hash = "sha256:3ef2f62a08c12ab4753e12f77314b756a87000bed3cfc460a12f59d55c3d0f66"},
-    {file = "pyleft-1.0.1.tar.gz", hash = "sha256:a291d10845d2c9217da70b797ea2cefaa4037927347983158473d8f6ed0e520a"},
+    {file = "pyleft-1.0.2-py3-none-any.whl", hash = "sha256:d1f3ee7fc7dc65bf117066c15ccaa6614602f3589022e77fc74d544a9bcb238f"},
+    {file = "pyleft-1.0.2.tar.gz", hash = "sha256:65cdf22037f0c352043afbe18e0d34b79734db559e0055ef9efeede8a59061b2"},
 ]
 pymysql = [
     {file = "PyMySQL-1.0.2-py3-none-any.whl", hash = "sha256:41fc3a0c5013d5f039639442321185532e3e2c8924687abe6537de157d403641"},
