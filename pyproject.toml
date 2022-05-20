@@ -14,7 +14,7 @@
     loguru          = "^0.6.0"     # logging
     beautifulsoup4  = "^4.11.1"    # HTML parsing
     dynaconf        = "^3.1.8"     # config
-    s3fs            = "^2022.3.0"  # S3
+    s3fs            = "^2022.5.0"  # S3
     peewee          = "^3.14.10"    # SQL
     PyMySQL         = "^1.0.2"     # MySQL
     psycopg2-binary = "^2.9.3"     # PostgreSQL

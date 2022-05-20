@@ -1,6 +1,6 @@
 [[package]]
 name = "aiobotocore"
-version = "2.2.0"
+version = "2.3.2"
 description = "Async client for aws services using botocore and aiohttp"
 category = "main"
 optional = false
@@ -349,7 +349,7 @@ reference = "mypypi"
 
 [[package]]
 name = "fsspec"
-version = "2022.3.0"
+version = "2022.5.0"
 description = "File-system specification"
 category = "main"
 optional = false
@@ -738,20 +738,20 @@ reference = "mypypi"
 
 [[package]]
 name = "s3fs"
-version = "2022.3.0"
+version = "2022.5.0"
 description = "Convenient Filesystem interface over S3"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-aiobotocore = ">=2.2.0,<2.3.0"
+aiobotocore = ">=2.3.0,<2.4.0"
 aiohttp = "<=4"
-fsspec = "2022.3.0"
+fsspec = "2022.5.0"
 
 [package.extras]
-awscli = ["aiobotocore[awscli] (>=2.2.0,<2.3.0)"]
-boto3 = ["aiobotocore[boto3] (>=2.2.0,<2.3.0)"]
+awscli = ["aiobotocore[awscli] (>=2.3.0,<2.4.0)"]
+boto3 = ["aiobotocore[boto3] (>=2.3.0,<2.4.0)"]
 
 [package.source]
 type = "legacy"
@@ -910,11 +910,11 @@ reference = "mypypi"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "eb6c694734c9c21996df579cb62e0fdfd341e327b39717a7b31844e00decf8eb"
+content-hash = "21d17329fe8032a18f928d39596d31d3e3632cebd80069869c05da1ddbedf147"
 
 [metadata.files]
 aiobotocore = [
-    {file = "aiobotocore-2.2.0.tar.gz", hash = "sha256:71357939c3022670d7bb94833194147a44ebfce24b1643e4e44fedc1ee7349ba"},
+    {file = "aiobotocore-2.3.2.tar.gz", hash = "sha256:4b6e88312170a4d25f6fad0047ea055fd15fc19cffc9120af75cfc45e1d2bd07"},
 ]
 aiohttp = [
     {file = "aiohttp-3.8.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:1ed0b6477896559f17b9eaeb6d38e07f7f9ffe40b9f0f9627ae8b9926ae260a8"},
@@ -1136,8 +1136,8 @@ frozenlist = [
     {file = "frozenlist-1.3.0.tar.gz", hash = "sha256:ce6f2ba0edb7b0c1d8976565298ad2deba6f8064d2bebb6ffce2ca896eb35b0b"},
 ]
 fsspec = [
-    {file = "fsspec-2022.3.0-py3-none-any.whl", hash = "sha256:a53491b003210fce6911dd8f2d37e20c41a27ce52a655eef11b885d1578ed4cf"},
-    {file = "fsspec-2022.3.0.tar.gz", hash = "sha256:fd582cc4aa0db5968bad9317cae513450eddd08b2193c4428d9349265a995523"},
+    {file = "fsspec-2022.5.0-py3-none-any.whl", hash = "sha256:2c198c50eb541a80bbd03540b07602c4a957366f3fb416a1f270d34bd4ff0926"},
+    {file = "fsspec-2022.5.0.tar.gz", hash = "sha256:7a5459c75c44e760fbe6a3ccb1f37e81e023cde7da8ba20401258d877ec483b4"},
 ]
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
@@ -1376,8 +1376,8 @@ requests = [
     {file = "requests-2.27.1.tar.gz", hash = "sha256:68d7c56fd5a8999887728ef304a6d12edc7be74f1cfa47714fc8b414525c9a61"},
 ]
 s3fs = [
-    {file = "s3fs-2022.3.0-py3-none-any.whl", hash = "sha256:dcf5792536363a95a25c8babb2d8ef1b6c4b1a2377986da8ce03f615d10780ed"},
-    {file = "s3fs-2022.3.0.tar.gz", hash = "sha256:af126157a4dae39df81e8931fbc36591f91da0c6744954fb0dd3f3c0ebdf91e3"},
+    {file = "s3fs-2022.5.0-py3-none-any.whl", hash = "sha256:c7bb327303e931cf641f3cac9b6412a8f1e2908cebd3de30900cb872a4a9f5d2"},
+    {file = "s3fs-2022.5.0.tar.gz", hash = "sha256:b40a3cbfaf80cbabaf0e332331117ccac69290efdac347184fb3ab6003f70465"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
