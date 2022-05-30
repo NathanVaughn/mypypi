@@ -195,6 +195,19 @@ url = "https://pypi.nthnv.me/simple"
 reference = "mypypi"
 
 [[package]]
+name = "cachelib"
+version = "0.7.0"
+description = "A collection of cache libraries in the same API interface."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.nthnv.me/simple"
+reference = "mypypi"
+
+[[package]]
 name = "certifi"
 version = "2021.10.8"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -320,13 +333,14 @@ reference = "mypypi"
 
 [[package]]
 name = "flask-caching"
-version = "1.10.1"
-description = "Adds caching support to your Flask application"
+version = "1.11.1"
+description = "Adds caching support to Flask applications."
 category = "main"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.7"
 
 [package.dependencies]
+cachelib = "*"
 Flask = "*"
 
 [package.source]
@@ -910,7 +924,7 @@ reference = "mypypi"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "21d17329fe8032a18f928d39596d31d3e3632cebd80069869c05da1ddbedf147"
+content-hash = "f95f74f094235c4a8c7e7e03f353fd0fe0d4328edf7147e6f72fce7b50fb4ae9"
 
 [metadata.files]
 aiobotocore = [
@@ -1042,6 +1056,10 @@ botocore = [
     {file = "botocore-1.24.21-py3-none-any.whl", hash = "sha256:92daca8775e738a9db9b465d533019285f09d541e903233261299fd87c2f842c"},
     {file = "botocore-1.24.21.tar.gz", hash = "sha256:7e976cfd0a61601e74624ef8f5246b40a01f2cce73a011ef29cf80a6e371d0fa"},
 ]
+cachelib = [
+    {file = "cachelib-0.7.0-py3-none-any.whl", hash = "sha256:80fa73dda398672329dab6c8e9e9bad03fd36dc4da40d911d7de308c91e8481e"},
+    {file = "cachelib-0.7.0.tar.gz", hash = "sha256:df254f3b900dc8684d8ebdd146c731ddb45edc6233a6cf7e3e834c949f360726"},
+]
 certifi = [
     {file = "certifi-2021.10.8-py2.py3-none-any.whl", hash = "sha256:d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569"},
     {file = "certifi-2021.10.8.tar.gz", hash = "sha256:78884e7c1d4b00ce3cea67b44566851c4343c120abd683433ce934a68ea58872"},
@@ -1071,8 +1089,8 @@ flask = [
     {file = "Flask-2.1.2.tar.gz", hash = "sha256:315ded2ddf8a6281567edb27393010fe3406188bafbfe65a3339d5787d89e477"},
 ]
 flask-caching = [
-    {file = "Flask-Caching-1.10.1.tar.gz", hash = "sha256:cf19b722fcebc2ba03e4ae7c55b532ed53f0cbf683ce36fafe5e881789a01c00"},
-    {file = "Flask_Caching-1.10.1-py3-none-any.whl", hash = "sha256:bcda8acbc7508e31e50f63e9b1ab83185b446f6b6318bd9dd1d45626fba2e903"},
+    {file = "Flask-Caching-1.11.1.tar.gz", hash = "sha256:28af189e97defb9e39b43ebe197b54a58aaee81bdeb759f46d969c26d7aa7810"},
+    {file = "Flask_Caching-1.11.1-py3-none-any.whl", hash = "sha256:36592812eec6cba86eca48bcda74eff24bfd6c8eaf6056ca0184474bb78c0dc4"},
 ]
 frozenlist = [
     {file = "frozenlist-1.3.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d2257aaba9660f78c7b1d8fea963b68f3feffb1a9d5d05a18401ca9eb3e8d0a3"},
