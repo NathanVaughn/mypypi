@@ -21,7 +21,7 @@
     redis           = "^4.3.4"     # Redis
 
 [tool.poetry.dev-dependencies]
-    black     = "^22.3"
+    black     = "^22.6"
     isort     = "^5.10.1"
     autoflake = "^1.4"
     pyleft    = "^1.1.0"
