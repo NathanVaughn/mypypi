@@ -59,7 +59,9 @@ class S3Files(BaseFiles):
 
         return self.fs.url(file_path, expires=10 * 60)  # type: ignore
 
-    def retrieve(self, file_url: str) -> Union[flask.Response, werkzeug.wrappers.Response]:
+    def retrieve(
+        self, file_url: str
+    ) -> Union[flask.Response, werkzeug.wrappers.Response]:
         file_path = self.build_path(file_url)
         return_url = self.fs.url(file_path, expires=10 * 60)
 

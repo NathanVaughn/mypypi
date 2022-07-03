@@ -4,8 +4,7 @@ from typing import List, Optional, Tuple
 import peewee as pw
 from loguru import logger
 
-import app.libraries.hash
-from app.libraries.url import get_filename
+from app.libraries.url import generate_url_key
 from app.storage.base import BaseStorage
 
 db = pw.DatabaseProxy()
@@ -169,7 +168,7 @@ class SQLStorage(BaseStorage):
 
         # create new file url entries for the missing urls
         new_file_urls = [
-            FileURL(url=url, key=get_filename(url))
+            FileURL(url=url, key=generate_url_key(url))
             for url in urls
             if url not in file_url_urls
         ]
@@ -178,8 +177,8 @@ class SQLStorage(BaseStorage):
         with db.atomic():
             FileURL.bulk_create(new_file_urls, batch_size=100)
 
-        # now, get the hashes for all the urls
-        return [get_filename(url) for url in urls]
+        # now, get the keys for all the urls
+        return [generate_url_key(url) for url in urls]
 
     def update_file_url_last_downloaded_time(self, url: str) -> None:
         logger.debug(f"Updating last downloaded time for {url}")

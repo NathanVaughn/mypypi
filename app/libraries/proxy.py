@@ -89,7 +89,7 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     return use_url_cache(url)
 
 
-def generate_proxy_file_url(url: str, hash_: str) -> str:
+def generate_proxy_file_url(url: str, key: str) -> str:
     """
     Given a file url and hash, return the proxy url.
     """
@@ -120,7 +120,7 @@ def proxy_urls(urls: List[str]) -> List[str]:
     """
     # create database entries in bulk for urls not in the database
     # more efficient than one at a time
-    hashes = storage_backend.get_or_create_file_url_keys(urls)
+    keys = storage_backend.get_or_create_file_url_keys(urls)
 
     # now go through normal proxy_url function
-    return [generate_proxy_file_url(url, hash_) for url, hash_ in zip(urls, hashes)]
+    return [generate_proxy_file_url(url, key) for url, key in zip(urls, keys)]
