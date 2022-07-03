@@ -18,7 +18,7 @@ def proxy(filename: str) -> Union[flask.Response, werkzeug.wrappers.Response]:
 
     if url is None:
         logger.info(f"URL key {filename} not found in database")
-        return flask.abort(HTTPStatus.BAD_REQUEST)  # type: ignore
+        return flask.abort(HTTPStatus.BAD_REQUEST)
 
     # get the file
     return file_backend.get(url)

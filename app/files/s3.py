@@ -1,8 +1,9 @@
 import urllib.parse
-from typing import Optional
+from typing import Optional, Union
 
 import flask
 import s3fs
+import werkzeug
 from loguru import logger
 
 from app.files.base import BaseFiles
@@ -54,11 +55,11 @@ class S3Files(BaseFiles):
 
         with self.fs.open(file_path, "wb") as f:
             for chunk in self.download(file_url):
-                f.write(chunk)  # type: ignore
+                f.write(chunk)
 
         return self.fs.url(file_path, expires=10 * 60)  # type: ignore
 
-    def retrieve(self, file_url: str) -> flask.Response:
+    def retrieve(self, file_url: str) -> Union[flask.Response, werkzeug.wrappers.Response]:
         file_path = self.build_path(file_url)
         return_url = self.fs.url(file_path, expires=10 * 60)
 
@@ -69,7 +70,7 @@ class S3Files(BaseFiles):
             return_url = return_url_parsed._replace(query="").geturl()
 
         logger.info(f"Retrieving redirect url for {file_url} to {return_url}")
-        return flask.redirect(return_url)  # type: ignore
+        return flask.redirect(return_url)
 
     def delete(self, file_url: str) -> None:
         file_path = self.build_path(file_url)
