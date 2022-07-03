@@ -20,7 +20,10 @@ def use_url_cache(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     logger.info(f"Using cache for {url}")
 
     result = storage_backend.get_url_cache(url)
-    assert result is not None
+
+    # if we need a URL cache but nothing ins available, return unavailable
+    if result is None:
+        return (HTTPStatus.SERVICE_UNAVAILABLE, b"", [])
 
     return result[0], result[1], json.loads(result[2])
 

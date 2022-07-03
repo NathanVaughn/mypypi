@@ -5,6 +5,7 @@ from http import HTTPStatus
 from typing import Generator, Union
 
 import flask
+import packaging.utils
 import requests
 import werkzeug
 from loguru import logger
@@ -19,14 +20,13 @@ class BaseFiles(abc.ABC):
         """
         Given a remote file url, return the path to save/load the file.
         """
-        file_url_hash = app.libraries.hash.sha256_string(file_url)
-
-        folder1 = file_url_hash[:2]
-        folder2 = file_url_hash[2:4]
-        folder3 = file_url_hash[4:]
         filename = app.libraries.url.get_filename(file_url)
+        if filename.endswith(".whl"):
+            name, version, _, _ = packaging.utils.parse_wheel_filename(filename)
+        else:
+            name, version = packaging.utils.parse_sdist_filename(filename)
 
-        return os.path.join(folder1, folder2, folder3, filename)
+        return os.path.join(name, str(version), filename)
 
     def download(self, file_url: str) -> Generator[bytes, None, None]:
         """
@@ -72,8 +72,10 @@ class BaseFiles(abc.ABC):
         Wrapper around `save`.
         """
         storage_backend.add_url_task(file_url)
-        self.save(file_url)
-        storage_backend.del_url_task(file_url)
+        try:
+            self.save(file_url)
+        finally:
+            storage_backend.del_url_task(file_url)
 
     @abc.abstractmethod
     def check(self, file_url: str) -> bool:

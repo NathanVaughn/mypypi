@@ -169,7 +169,7 @@ def _db_connect() -> None:
 
 
 @flask_app.teardown_request
-def _db_close(exc : Any) -> None:
+def _db_close(exc: Any) -> None:
     """
     After each request (no matter what), close the connection to the database.
     """

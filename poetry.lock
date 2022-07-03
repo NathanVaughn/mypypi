@@ -924,7 +924,7 @@ url = "https://pypi.nthnv.me/simple"
 [metadata]
 lock-version = "1.1"
     python-versions = ">=3.8,<4.0"
-content-hash = "96476a5ec6373a453a1d5153895938b1b9a6d9b491bbf6ff42561ec030636da7"
+content-hash = "714e21629285f74af5594798560ffcd8f236f4883bb967eaac2cb4405a24ac80"
 
 [metadata.files]
 aiobotocore = [

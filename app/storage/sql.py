@@ -160,6 +160,9 @@ class SQLStorage(BaseStorage):
     def get_or_create_file_url_keys(self, urls: List[str]) -> List[str]:
         logger.debug("Getting bulk list of keys")
 
+        # preprocess URLs to remove anchors
+        urls = [url.split("#")[0] for url in urls]
+
         # first, get urls that already exist
         file_url_objs: List[FileURL] = FileURL.select(FileURL.url).where(FileURL.url.in_(urls)).execute()  # type: ignore
         file_url_urls = [file_url.url for file_url in file_url_objs]
