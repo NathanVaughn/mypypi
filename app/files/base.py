@@ -48,24 +48,24 @@ class BaseFiles(abc.ABC):
         Will download the file if it does not exist.
         """
         logger.info(f"Getting file: {file_url}")
-        if not self.check(file_url):
-            # if a task not in progress
-            if not self.in_progress(file_url):
-                # download the file in a background thread
-                process = threading.Thread(target=self.save_wrapper, args=(file_url,))
-                process.start()
-
-            # if strict about not sending to upstream
-            if flask_app.config.UPSTREAM_STRICT:
-                return flask.abort(HTTPStatus.SERVICE_UNAVAILABLE)
-
-            # redirect to original url
+        if self.check(file_url):
             storage_backend.update_file_url_last_downloaded_time(file_url)
-            logger.debug(f"Redirecting to {file_url}")
-            return flask.redirect(file_url)
+            return self.retrieve(file_url)
 
+        # if a task not in progress
+        if not self.in_progress(file_url):
+            # download the file in a background thread
+            process = threading.Thread(target=self.save_wrapper, args=(file_url,))
+            process.start()
+
+        # if strict about not sending to upstream
+        if flask_app.config["UPSTREAM_STRICT"]:
+            return flask.abort(HTTPStatus.SERVICE_UNAVAILABLE)
+
+        # redirect to original url
         storage_backend.update_file_url_last_downloaded_time(file_url)
-        return self.retrieve(file_url)
+        logger.debug(f"Redirecting to {file_url}")
+        return flask.redirect(file_url)
 
     def save_wrapper(self, file_url: str) -> None:
         """
@@ -75,18 +75,21 @@ class BaseFiles(abc.ABC):
         self.save(file_url)
         storage_backend.del_url_task(file_url)
 
+    @abc.abstractmethod
     def check(self, file_url: str) -> bool:
         """
         Given a remote file url, return whether or not we have the file already.
         """
         raise NotImplementedError
 
+    @abc.abstractmethod
     def save(self, file_url: str) -> str:
         """
         Given a remote file url, download and save the file to our storage.
         """
         raise NotImplementedError
 
+    @abc.abstractmethod
     def retrieve(self, file_url: str) -> flask.Response:
         """
         Given a remote file url, return a flask response.
@@ -94,6 +97,7 @@ class BaseFiles(abc.ABC):
         """
         raise NotImplementedError
 
+    @abc.abstractmethod
     def delete(self, file_url: str) -> None:
         """
         Given a remote file url, delete the file from our storage.

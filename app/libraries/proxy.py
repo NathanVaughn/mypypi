@@ -34,7 +34,7 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
 
     # if a record exists and is still valid
     if storage_backend.is_url_cache_valid(
-        url, flask.current_app.config.CACHE_DEFAULT_TIMEOUT
+        url, flask.current_app.config["CACHE_DEFAULT_TIMEOUT"]
     ):
         return use_url_cache(url)
 
@@ -47,8 +47,8 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
             and "UPSTREAM_PASSWORD" in flask_app.config
         ):
             kwargs["auth"] = requests.auth.HTTPBasicAuth(
-                flask_app.config.UPSTREAM_USERNAME,
-                flask_app.config.UPSTREAM_PASSWORD,
+                flask_app.config["UPSTREAM_USERNAME"],
+                flask_app.config["UPSTREAM_PASSWORD"],
             )
         resp = requests.get(url, headers={"User-Agent": "mypypi 1.0"}, **kwargs)
     except requests.exceptions.RequestException as e:
@@ -99,7 +99,6 @@ def generate_proxy_file_url(url: str, hash_: str) -> str:
     # determine an applicable version
     new_url = flask.url_for(
         "files.proxy",
-        hash_=hash_,
         filename=get_filename(url),
         _external=True,
     )
@@ -118,10 +117,7 @@ def proxy_urls(urls: List[str]) -> List[str]:
     """
     # create database entries in bulk for urls not in the database
     # more efficient than one at a time
-    hashes = storage_backend.get_or_create_file_url_hashes(urls)
-
-    # for url, hash_ in zip(urls, hashes):
-    #     assert sha256_string(url) == hash_
+    hashes = storage_backend.get_or_create_file_url_keys(urls)
 
     # now go through normal proxy_url function
     return [generate_proxy_file_url(url, hash_) for url, hash_ in zip(urls, hashes)]

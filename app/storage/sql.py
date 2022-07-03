@@ -5,6 +5,7 @@ import peewee as pw
 from loguru import logger
 
 import app.libraries.hash
+from app.libraries.url import get_filename
 from app.storage.base import BaseStorage
 
 db = pw.DatabaseProxy()
@@ -35,7 +36,7 @@ class URLCache(BaseModel):
 # table to hold our hashes and the urls they are associated with
 class FileURL(BaseModel):
     url = pw.TextField(unique=True)
-    hash_ = pw.TextField(unique=True)
+    key = pw.TextField(unique=True)
     time_last_downloaded = pw.DateTimeField(null=True)
     download_count = pw.IntegerField(default=0)
 
@@ -43,6 +44,7 @@ class FileURL(BaseModel):
 # table to hold in-progress downloads
 class URLTask(BaseModel):
     url = pw.TextField(unique=True)
+    time_created = pw.DateTimeField(default=datetime.datetime.now)
 
 
 class SQLStorage(BaseStorage):
@@ -145,18 +147,18 @@ class SQLStorage(BaseStorage):
     # File URL
     # ================================================================
 
-    def get_file_url_from_hash(self, hash_: str) -> Optional[str]:
+    def get_file_url_from_key(self, key: str) -> Optional[str]:
         # get url from hash
-        logger.debug(f"Getting file url from hash {hash_}")
-        file_url = FileURL.get_or_none(FileURL.hash_ == hash_)
+        logger.debug(f"Getting file url from key {key}")
+        file_url = FileURL.get_or_none(FileURL.key == key)
 
         if file_url is None:
             return None
 
         return file_url.url
 
-    def get_or_create_file_url_hashes(self, urls: List[str]) -> List[str]:
-        logger.debug("Getting bulk list of hashes")
+    def get_or_create_file_url_keys(self, urls: List[str]) -> List[str]:
+        logger.debug("Getting bulk list of keys")
 
         # first, get urls that already exist
         file_url_objs: List[FileURL] = FileURL.select(FileURL.url).where(FileURL.url.in_(urls)).execute()  # type: ignore
@@ -164,7 +166,7 @@ class SQLStorage(BaseStorage):
 
         # create new file url entries for the missing urls
         new_file_urls = [
-            FileURL(url=url, hash_=app.libraries.hash.sha256_string(url))
+            FileURL(url=url, key=get_filename(url))
             for url in urls
             if url not in file_url_urls
         ]
@@ -174,7 +176,7 @@ class SQLStorage(BaseStorage):
             FileURL.bulk_create(new_file_urls, batch_size=100)
 
         # now, get the hashes for all the urls
-        return [app.libraries.hash.sha256_string(url) for url in urls]
+        return [get_filename(url) for url in urls]
 
     def update_file_url_last_downloaded_time(self, url: str) -> None:
         logger.debug(f"Updating last downloaded time for {url}")

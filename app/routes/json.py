@@ -58,7 +58,7 @@ def project(projectname: str) -> flask.Response:
     # make request to upstream
     logger.debug(f"Getting upstream JSON for {projectname}")
     status_code, content, headers = app.libraries.proxy.reverse_proxy(
-        f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{url_postfix}"
+        f"{flask.current_app.config['UPSTREAM_URL']}/{url_prefix}/{projectname}/{url_postfix}"
     )
     if status_code != http.HTTPStatus.OK:
         return flask.Response(content, status_code, headers)
@@ -77,7 +77,7 @@ def project_version(projectname: str, version: str) -> flask.Response:
     # make request to upstream
     logger.debug(f"Getting upstream JSON for {projectname}/{version}")
     status_code, content, headers = app.libraries.proxy.reverse_proxy(
-        f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}/{version}/{url_postfix}"
+        f"{flask.current_app.config['UPSTREAM_URL']}/{url_prefix}/{projectname}/{version}/{url_postfix}"
     )
 
     if status_code != http.HTTPStatus.OK:

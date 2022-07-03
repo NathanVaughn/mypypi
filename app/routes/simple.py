@@ -36,7 +36,7 @@ def project(projectname: str) -> flask.Response:
     # make request to upstream
     logger.debug(f"Getting upstream simple for {projectname}")
     status_code, content, headers = app.libraries.proxy.reverse_proxy(
-        f"{flask.current_app.config.UPSTREAM_URL}/{url_prefix}/{projectname}"
+        f"{flask.current_app.config['UPSTREAM_URL']}/{url_prefix}/{projectname}"
     )
 
     if status_code != http.HTTPStatus.OK:
