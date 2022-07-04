@@ -32,8 +32,8 @@ class URLCache(BaseModel):
     time_created = pw.DateTimeField(default=datetime.datetime.now)
 
 
-# table to hold our hashes and the urls they are associated with
-class FileURL(BaseModel):
+# table to hold keys and the urls they are associated with
+class FileURLKey(BaseModel):
     url = pw.TextField(unique=True)
     key = pw.TextField(unique=True)
     time_last_downloaded = pw.DateTimeField(null=True)
@@ -41,7 +41,7 @@ class FileURL(BaseModel):
 
 
 # table to hold in-progress downloads
-class URLTask(BaseModel):
+class URLDownloadTask(BaseModel):
     url = pw.TextField(unique=True)
     time_created = pw.DateTimeField(default=datetime.datetime.now)
 
@@ -49,7 +49,7 @@ class URLTask(BaseModel):
 class SQLStorage(BaseStorage):
     def __init__(self, database: pw.Database) -> None:
         db.initialize(database)
-        db.create_tables([BlobChunk, URLCache, FileURL, URLTask])
+        db.create_tables([BlobChunk, URLCache, FileURLKey, URLDownloadTask])
 
     # ================================================================
     # URL Cache
@@ -149,7 +149,7 @@ class SQLStorage(BaseStorage):
     def get_file_url_from_key(self, key: str) -> Optional[str]:
         # get url from hash
         logger.debug(f"Getting file url from key {key}")
-        file_url = FileURL.get_or_none(FileURL.key == key)
+        file_url = FileURLKey.get_or_none(FileURLKey.key == key)
 
         if file_url is None:
             return None
@@ -163,19 +163,19 @@ class SQLStorage(BaseStorage):
         urls = [url.split("#")[0] for url in urls]
 
         # first, get urls that already exist
-        file_url_objs: List[FileURL] = FileURL.select(FileURL.url).where(FileURL.url.in_(urls)).execute()  # type: ignore
+        file_url_objs: List[FileURLKey] = FileURLKey.select(FileURLKey.url).where(FileURLKey.url.in_(urls)).execute()  # type: ignore
         file_url_urls = [file_url.url for file_url in file_url_objs]
 
         # create new file url entries for the missing urls
         new_file_urls = [
-            FileURL(url=url, key=generate_url_key(url))
+            FileURLKey(url=url, key=generate_url_key(url))
             for url in urls
             if url not in file_url_urls
         ]
 
         # bulk create
         with db.atomic():
-            FileURL.bulk_create(new_file_urls, batch_size=100)
+            FileURLKey.bulk_create(new_file_urls, batch_size=100)
 
         # now, get the keys for all the urls
         return [generate_url_key(url) for url in urls]
@@ -184,7 +184,8 @@ class SQLStorage(BaseStorage):
         logger.debug(f"Updating last downloaded time for {url}")
 
         # update the last downloaded time for the url
-        file_url = FileURL.get_or_none(FileURL.url == url)
+        # npm won't already have the url in the database, so we need to create it
+        file_url, _ = FileURLKey.get_or_create(url=url, key=generate_url_key(url))
 
         if file_url is not None:
             file_url.download_count += 1
@@ -195,23 +196,28 @@ class SQLStorage(BaseStorage):
     # Downloads
     # ================================================================
 
-    def check_url_task(self, url: str) -> bool:
+    def check_url_download_task(self, url: str) -> bool:
         # get a download task
-        logger.debug(f"Checking if task for {url} exists")
-        result = bool(URLTask.get_or_none(URLTask.url == url))
-        logger.debug(f"Result: {result}")
+        return bool(URLDownloadTask.get_or_none(URLDownloadTask.url == url))
 
-        return result
+    def add_url_download_task(self, url: str) -> None:
+        logger.debug(f"Creating download task for {url}")
+        URLDownloadTask.create(url=url)
 
-    def add_url_task(self, url: str) -> None:
-        logger.debug(f"Creating task for {url}")
-        URLTask.create(url=url)
-
-    def del_url_task(self, url: str) -> None:
+    def del_url_download_task(self, url: str) -> None:
         # delete a url task
-        logger.debug(f"Deleting task for {url}")
-        task = URLTask.get(URLTask.url == url)
+        logger.debug(f"Deleting download task for {url}")
+        task = URLDownloadTask.get(URLDownloadTask.url == url)
         task.delete_instance()
+
+    def get_oldest_url_download_task(self) -> Optional[str]:
+        # get the oldest url task
+        task = URLDownloadTask.select().order_by(URLDownloadTask.time_created).first()  # type: ignore
+
+        if task is None:
+            return None
+
+        return task.url
 
     # ================================================================
     # Prune
@@ -221,7 +227,7 @@ class SQLStorage(BaseStorage):
         # very infrequently used, so not too big of a deal
         from app.main import file_backend  # noqa
 
-        file_urls: List[FileURL] = FileURL.select().where(FileURL.time_last_downloaded < datetime.datetime.now() - datetime.timedelta(days=days))  # type: ignore
+        file_urls: List[FileURLKey] = FileURLKey.select().where(FileURLKey.time_last_downloaded < datetime.datetime.now() - datetime.timedelta(days=days))  # type: ignore
         file_urls_urls = [str(file_url.url) for file_url in file_urls]
 
         if not dry_run:

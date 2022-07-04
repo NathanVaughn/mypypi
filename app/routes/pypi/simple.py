@@ -21,7 +21,7 @@ def process_html(html: bytes) -> str:
     a_tags = soup.find_all("a")
 
     # generate all the proxy urls
-    proxy_urls = app.libraries.proxy.proxy_urls([a["href"] for a in a_tags])
+    proxy_urls = app.libraries.proxy.proxy_pypi_urls([a["href"] for a in a_tags])
 
     # rewrite the anchor tags
     for a_tag, proxy_url in zip(a_tags, proxy_urls):

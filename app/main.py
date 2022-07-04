@@ -1,4 +1,5 @@
 import os
+import threading
 from typing import Any
 
 import peewee as pw
@@ -8,14 +9,14 @@ from flask_caching import Cache
 from loguru import logger
 from werkzeug.wrappers.response import Response
 
+from app.downloader import Downloader
+
 flask_app = Flask(__name__)
 FlaskDynaconf(flask_app, ENVVAR_PREFIX="MYPYPI")
 
 # =============================================================================
 # Set up default values
 # =============================================================================
-
-# dictionary syntax needs to be used so the updated settings copy correctly
 
 
 def default_value(key: str, value: Any) -> None:
@@ -25,8 +26,16 @@ def default_value(key: str, value: Any) -> None:
     flask_app.config[key] = flask_app.config.get(key, value)
 
 
+default_value("MODE", "pypi")
+
 # config upstream
-default_value("UPSTREAM_URL", "https://pypi.org")
+if flask_app.config["MODE"] == "pypi":
+    default_value("UPSTREAM_URL", "https://pypi.org")
+elif flask_app.config["MODE"] == "npm":
+    default_value("UPSTREAM_URL", "https://registry.npmjs.org")
+else:
+    raise ValueError(f"Unknown mode: {flask_app.config['MODE']}")
+
 flask_app.config["UPSTREAM_URL"] = flask_app.config["UPSTREAM_URL"].rstrip("/")
 
 default_value("UPSTREAM_STRICT", False)
@@ -83,6 +92,7 @@ if flask_app.config["DATABASE_DRIVER"].lower() == "sqlite":
         )
         os.makedirs(os.path.dirname(_sqlite_path), exist_ok=True)
         _database = pw.SqliteDatabase(_sqlite_path)
+
 elif flask_app.config["DATABASE_DRIVER"].lower() == "postgres":
     _database = pw.PostgresqlDatabase(
         flask_app.config["DATABASE_NAME"],
@@ -91,6 +101,7 @@ elif flask_app.config["DATABASE_DRIVER"].lower() == "postgres":
         host=flask_app.config["DATABASE_HOST"],
         port=flask_app.config["DATABASE_PORT"],
     )
+
 elif flask_app.config["DATABASE_DRIVER"].lower() == "mysql":
     _database = pw.MySQLDatabase(
         flask_app.config["DATABASE_NAME"],
@@ -114,6 +125,7 @@ if flask_app.config["FILE_STORAGE_DRIVER"].lower() == "local":
             flask_app.config["FILE_STORAGE_DIRECTORY"],
         )
     )
+
 elif flask_app.config["FILE_STORAGE_DRIVER"].lower() == "s3":
     import app.files.s3
 
@@ -126,25 +138,40 @@ elif flask_app.config["FILE_STORAGE_DRIVER"].lower() == "s3":
         public=flask_app.config["S3_PUBLIC"],
         prefix=flask_app.config.get("S3_PREFIX", None),
     )
+
 else:
     raise ValueError(
         f"Unknown file storage driver: {flask_app.config['FILE_STORAGE_DRIVER']}"
     )
 
+downloader = Downloader(storage_backend, file_backend)
+downloader_thread = threading.Thread(target=downloader.run)
+downloader_thread.start()
+
 # =============================================================================
 # Set up routes
 # =============================================================================
 
-from app.routes.files import files_bp
-from app.routes.json import json_bp
-from app.routes.simple import simple_bp
+if flask_app.config["MODE"] == "pypi":
+    from app.routes.pypi.files import files_bp
+    from app.routes.pypi.json import json_bp
+    from app.routes.pypi.simple import simple_bp
 
-# pypi routes
-flask_app.register_blueprint(simple_bp)
-flask_app.register_blueprint(json_bp)
+    # pypi routes
+    flask_app.register_blueprint(simple_bp)
+    flask_app.register_blueprint(json_bp)
 
-# our internal routes
-flask_app.register_blueprint(files_bp)
+    # our internal routes
+    flask_app.register_blueprint(files_bp)
+
+else:
+    from app.routes.npm.files import files_bp
+    from app.routes.npm.packages import packages_bp
+
+    # npm routes
+    flask_app.register_blueprint(files_bp)
+    flask_app.register_blueprint(packages_bp)
+
 
 # =============================================================================
 # Hooks

@@ -1,6 +1,6 @@
 import abc
 import os
-import threading
+import urllib.parse
 from http import HTTPStatus
 from typing import Generator, Union
 
@@ -21,12 +21,22 @@ class BaseFiles(abc.ABC):
         Given a remote file url, return the path to save/load the file.
         """
         filename = app.libraries.url.get_filename(file_url)
-        if filename.endswith(".whl"):
-            name, version, _, _ = packaging.utils.parse_wheel_filename(filename)
-        else:
-            name, version = packaging.utils.parse_sdist_filename(filename)
 
-        return os.path.join(name, str(version), filename)
+        if flask_app.config["MODE"] == "pypi":
+            if filename.endswith(".whl"):
+                name, version, _, _ = packaging.utils.parse_wheel_filename(filename)
+            else:
+                name, version = packaging.utils.parse_sdist_filename(filename)
+
+            return os.path.join(name, str(version), filename)
+        else:
+            # example url:
+            # https://registry.npmjs.org/@zzzen/pyright-internal/-/pyright-internal-1.1.254.tgz
+            parsed = urllib.parse.urlparse(file_url)
+            # path will always start with a slash
+            namespace = parsed.path[1:].split("/-/")[0]
+
+            return os.path.join(*namespace.split("/"), filename)
 
     def download(self, file_url: str) -> Generator[bytes, None, None]:
         """
@@ -40,7 +50,7 @@ class BaseFiles(abc.ABC):
         """
         Check if there is already a task in-progress to download/upload this file url.
         """
-        return storage_backend.check_url_task(file_url)
+        return storage_backend.check_url_download_task(file_url)
 
     def get(self, file_url: str) -> Union[flask.Response, werkzeug.wrappers.Response]:
         """
@@ -54,9 +64,7 @@ class BaseFiles(abc.ABC):
 
         # if a task not in progress
         if not self.in_progress(file_url):
-            # download the file in a background thread
-            process = threading.Thread(target=self.save_wrapper, args=(file_url,))
-            process.start()
+            storage_backend.add_url_download_task(file_url)
 
         # if strict about not sending to upstream
         if flask_app.config["UPSTREAM_STRICT"]:
@@ -66,16 +74,6 @@ class BaseFiles(abc.ABC):
         storage_backend.update_file_url_last_downloaded_time(file_url)
         logger.debug(f"Redirecting to {file_url}")
         return flask.redirect(file_url)
-
-    def save_wrapper(self, file_url: str) -> None:
-        """
-        Wrapper around `save`.
-        """
-        storage_backend.add_url_task(file_url)
-        try:
-            self.save(file_url)
-        finally:
-            storage_backend.del_url_task(file_url)
 
     @abc.abstractmethod
     def check(self, file_url: str) -> bool:

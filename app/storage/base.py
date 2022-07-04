@@ -63,22 +63,29 @@ class BaseStorage(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def check_url_task(self, url: str) -> bool:
+    def check_url_download_task(self, url: str) -> bool:
         """
-        Return if a task for the given url exists
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def add_url_task(self, url: str) -> None:
-        """
-        Add a task record for the url.
+        Return if a download task for the given url exists
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def del_url_task(self, url: str) -> None:
+    def add_url_download_task(self, url: str) -> None:
         """
-        Delete the task record for the url.
+        Add a download task record for the url.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def del_url_download_task(self, url: str) -> None:
+        """
+        Delete the download task record for the url.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_oldest_url_download_task(self) -> Optional[str]:
+        """
+        Get the oldest download URL task.
         """
         raise NotImplementedError

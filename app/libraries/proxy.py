@@ -1,7 +1,7 @@
 import json
 from http import HTTPStatus
-from typing import List, Tuple
-from urllib.parse import urlparse
+from typing import Any, List, Literal, Tuple
+from urllib.parse import unquote, urlparse
 
 import flask
 import requests
@@ -33,7 +33,7 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     Proxies request and returns the
     status code, response content, and applicable headers
     """
-    logger.info(f"Proxying request to {url}")
+    logger.info(f"Proxying GET request to {url}")
 
     # if a record exists and is still valid
     if storage_backend.is_url_cache_valid(
@@ -41,10 +41,10 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     ):
         return use_url_cache(url)
 
-    # if request fails, use cache
     try:
-        # make request to upstream
         kwargs = {}
+
+        # add credentials if they are configured
         if (
             "UPSTREAM_USERNAME" in flask_app.config
             and "UPSTREAM_PASSWORD" in flask_app.config
@@ -53,8 +53,12 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
                 flask_app.config["UPSTREAM_USERNAME"],
                 flask_app.config["UPSTREAM_PASSWORD"],
             )
+
+        # make request to upstream
         resp = requests.get(url, headers={"User-Agent": "mypypi 1.0"}, **kwargs)
+
     except requests.exceptions.RequestException as e:
+        # if request fails, use cache
         logger.error(e)
         return use_url_cache(url)
 
@@ -89,9 +93,9 @@ def reverse_proxy(url: str) -> Tuple[int, bytes, List[Tuple[str, str]]]:
     return use_url_cache(url)
 
 
-def generate_proxy_file_url(url: str, key: str) -> str:
+def generate_proxy_file_url_pypi(url: str) -> str:
     """
-    Given a file url and hash, return the proxy url.
+    Given a file url, return the proxy url for PyPi.
     """
     # need to extract the url fragement, as it contains the hash
     parsed = urlparse(url)
@@ -114,13 +118,30 @@ def generate_proxy_file_url(url: str, key: str) -> str:
     return new_url
 
 
-def proxy_urls(urls: List[str]) -> List[str]:
+def generate_proxy_file_url_npm(url: str) -> str:
+    """
+    Given a file url, return the proxy url for NPM.
+    """
+    parsed = urlparse(url)
+
+    # unqouting is absolutely required, npm cli chokes otherwise
+    return unquote(
+        flask.url_for(
+            "files.proxy",
+            filename=get_filename(url),
+            packagename=parsed.path.split("/-/")[0],
+            _external=True,
+        )
+    )
+
+
+def proxy_pypi_urls(urls: List[str]) -> List[str]:
     """
     Given a list of file urls, return a list of proxy urls.
     """
     # create database entries in bulk for urls not in the database
     # more efficient than one at a time
-    keys = storage_backend.get_or_create_file_url_keys(urls)
+    storage_backend.get_or_create_file_url_keys(urls)
 
     # now go through normal proxy_url function
-    return [generate_proxy_file_url(url, key) for url, key in zip(urls, keys)]
+    return [generate_proxy_file_url_pypi(url) for url in urls]

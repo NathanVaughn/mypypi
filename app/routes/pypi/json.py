@@ -28,7 +28,7 @@ def process_json(json_data: bytes) -> str:
         url_objects.extend(iter(releases[release]))
 
     # generate all the proxy urls
-    proxy_urls = app.libraries.proxy.proxy_urls([u["url"] for u in url_objects])
+    proxy_urls = app.libraries.proxy.proxy_pypi_urls([u["url"] for u in url_objects])
 
     # rewrite the url objects
     for url_obj, proxy_url in zip(url_objects, proxy_urls):
@@ -43,7 +43,7 @@ def process_json(json_data: bytes) -> str:
     url_objects = urls
 
     # generate all the proxy urls
-    proxy_urls = app.libraries.proxy.proxy_urls([u["url"] for u in url_objects])
+    proxy_urls = app.libraries.proxy.proxy_pypi_urls([u["url"] for u in url_objects])
 
     # rewrite the url objects
     for url_obj, proxy_url in zip(url_objects, proxy_urls):

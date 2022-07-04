@@ -18,7 +18,13 @@ class LocalFiles(BaseFiles):
     def check(self, file_url: str) -> bool:
         # checks if the file exists
         file_path = self.build_path(file_url)
+        lock_file = f"{file_path}.lock"
+
         result = os.path.exists(file_path)
+
+        # check if lock file exists, means we're still downloading
+        if os.path.exists(lock_file):
+            result = False
 
         logger.info(f"Checking if file {file_path} exists: {result}")
         return result
@@ -26,13 +32,22 @@ class LocalFiles(BaseFiles):
     def save(self, file_url: str) -> str:
         # build path to save file to
         file_path = self.build_path(file_url)
+        lock_file = f"{file_path}.lock"
+
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         logger.info(f"Saving {file_url} to {file_path}")
+
+        # create a lock file to denote download is in progress
+        with open(lock_file, "w") as f:
+            f.write("")
 
         # save the file
         with open(file_path, "wb") as f:
             for chunk in self.download(file_url):
                 f.write(chunk)
+
+        # remove lock file
+        os.remove(lock_file)
 
         return file_path
 
@@ -42,7 +57,7 @@ class LocalFiles(BaseFiles):
         logger.info(f"Generating response URL for {file_path}")
 
         return flask.send_from_directory(
-            os.path.dirname(file_path), os.path.basename(file_path)
+            os.path.dirname(file_path), os.path.basename(file_path), as_attachment=True
         )
 
     def delete(self, file_url: str) -> None:
