@@ -6,12 +6,14 @@ import s3fs
 import werkzeug
 from loguru import logger
 
+from app.database import Database
 from app.files.base import BaseFiles
 
 
 class S3Files(BaseFiles):
     def __init__(
         self,
+        database: Database,
         bucket: str,
         access_key: str,
         secret_key: str,
@@ -20,6 +22,8 @@ class S3Files(BaseFiles):
         public: bool = False,
         prefix: Optional[str] = None,
     ) -> None:
+        super().__init__(database)
+
         self.bucket = bucket
 
         client_kwargs = {}
@@ -36,7 +40,10 @@ class S3Files(BaseFiles):
         self.prefix = prefix
 
     def build_path(self, file_url: str) -> str:
+        # normalize the url from filesystem paths
         path = super().build_path(file_url).replace("\\", "/")
+
+        # add prefix
         if self.prefix:
             path = f"{self.prefix.rstrip('/')}/{path}"
 
@@ -44,10 +51,7 @@ class S3Files(BaseFiles):
 
     def check(self, file_url: str) -> bool:
         file_path = self.build_path(file_url)
-        result = self.fs.exists(file_path)
-
-        logger.info(f"Checking if file {file_path} exists: {result}")
-        return result
+        return self.fs.exists(file_path)
 
     def save(self, file_url: str) -> str:
         file_path = self.build_path(file_url)
@@ -71,7 +75,7 @@ class S3Files(BaseFiles):
             return_url_parsed = urllib.parse.urlparse(return_url)
             return_url = return_url_parsed._replace(query="").geturl()
 
-        logger.info(f"Retrieving redirect url for {file_url} to {return_url}")
+        logger.info(f"Redirecting to {return_url}")
         return flask.redirect(return_url)
 
     def delete(self, file_url: str) -> None:

@@ -1,17 +1,18 @@
+import functools
 import http
 import json
 
 import flask
-from loguru import logger
 
-import app.libraries.proxy
-from app.main import cache
+import app.libraries.url
+from app.main import database_backend, flask_app, proxy
 
 url_prefix = "pypi"
 url_postfix = "json"
 json_bp = flask.Blueprint("json", __name__, url_prefix=f"/{url_prefix}")
 
 
+@functools.lru_cache(maxsize=None)
 def process_json(json_data: bytes) -> str:
     """
     Rewrite all file URLs in a json page with our file proxy.
@@ -20,72 +21,81 @@ def process_json(json_data: bytes) -> str:
 
     # ===================================
     # go through the urls in the releases
-    releases = data["releases"]
+    release_datas = []
+    for rd in data["releases"].values():
+        release_datas.extend(rd)
 
-    # make a list of all url objects that need updating
-    url_objects = []
-    for release in releases:
-        url_objects.extend(iter(releases[release]))
+    # make list of all filekey, url pairs
+    filekey_url_pairs = [
+        (app.libraries.url.url_filename(release_data["url"]), release_data["url"])
+        for release_data in release_datas
+    ]
 
-    # generate all the proxy urls
-    proxy_urls = app.libraries.proxy.proxy_pypi_urls([u["url"] for u in url_objects])
+    # bulk insert
+    database_backend.bulk_add_file_url_keys(filekey_url_pairs)
 
-    # rewrite the url objects
-    for url_obj, proxy_url in zip(url_objects, proxy_urls):
-        url_obj["url"] = proxy_url
+    # rewrite the release urls
+    for filekey_url_pair, release_data in zip(filekey_url_pairs, release_datas):
+        release_data["url"] = flask.url_for(
+            "files.proxy",
+            filekey=filekey_url_pair[0],
+            _external=True,
+        )
 
     # ===================================
     # go through the urls in the urls
-    urls = data["urls"]
-
-    # make a list of all url objects that need updating
-    # in this case, `urls` is a list of url objects
-    url_objects = urls
-
-    # generate all the proxy urls
-    proxy_urls = app.libraries.proxy.proxy_pypi_urls([u["url"] for u in url_objects])
-
-    # rewrite the url objects
-    for url_obj, proxy_url in zip(url_objects, proxy_urls):
-        url_obj["url"] = proxy_url
+    # the file keys should have already been captured, no need to redo
+    for url in data["urls"]:
+        url["url"] = flask.url_for(
+            "files.proxy",
+            filekey=app.libraries.url.url_filename(url["url"]),
+            _external=True,
+        )
 
     return json.dumps(data, indent=4)
 
 
-@json_bp.route("/<string:projectname>/json")
-@cache.cached()
+@json_bp.route(f"/<string:projectname>/{url_postfix}")
 def project(projectname: str) -> flask.Response:
-    # make request to upstream
-    logger.debug(f"Getting upstream JSON for {projectname}")
-    status_code, content, headers = app.libraries.proxy.reverse_proxy(
-        f"{flask.current_app.config['UPSTREAM_URL']}/{url_prefix}/{projectname}/{url_postfix}"
+    # get the cached data from the upstream
+    url_cache = proxy.get(
+        f"{flask_app.config['UPSTREAM_URL']}/{url_prefix}/{projectname}/{url_postfix}"
     )
-    if status_code != http.HTTPStatus.OK:
-        return flask.Response(content, status_code, headers)
 
-    # process json
-    logger.debug(f"Processing JSON for {projectname}")
-    new_json = process_json(content)
+    # if the response is bad, return as-is
+    if url_cache["status_code"] != http.HTTPStatus.OK:
+        return flask.Response(
+            url_cache["content"],
+            url_cache["status_code"],
+            url_cache["headers"],
+        )
 
     # craft response
-    return flask.Response(new_json, status_code, headers)
+    return flask.Response(
+        process_json(url_cache["content"]),
+        url_cache["status_code"],
+        url_cache["headers"],
+    )
 
 
-@json_bp.route("/<string:projectname>/<string:version>/json")
-@cache.cached()
+@json_bp.route(f"/<string:projectname>/<string:version>/{url_postfix}")
 def project_version(projectname: str, version: str) -> flask.Response:
-    # make request to upstream
-    logger.debug(f"Getting upstream JSON for {projectname}/{version}")
-    status_code, content, headers = app.libraries.proxy.reverse_proxy(
-        f"{flask.current_app.config['UPSTREAM_URL']}/{url_prefix}/{projectname}/{version}/{url_postfix}"
+    # get the cached data from the upstream
+    url_cache = proxy.get(
+        f"{flask_app.config['UPSTREAM_URL']}/{url_prefix}/{projectname}/{version}/{url_postfix}"
     )
 
-    if status_code != http.HTTPStatus.OK:
-        return flask.Response(content, status_code, headers)
-
-    # process json
-    logger.debug(f"Processing JSON for {projectname}/{version}")
-    new_json = process_json(content)
+    # if the response is bad, return as-is
+    if url_cache["status_code"] != http.HTTPStatus.OK:
+        return flask.Response(
+            url_cache["content"],
+            url_cache["status_code"],
+            url_cache["headers"],
+        )
 
     # craft response
-    return flask.Response(new_json, status_code, headers)
+    return flask.Response(
+        process_json(url_cache["content"]),
+        url_cache["status_code"],
+        url_cache["headers"],
+    )

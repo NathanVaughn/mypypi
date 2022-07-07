@@ -1,24 +1,40 @@
 from http import HTTPStatus
-from typing import Union
 
 import flask
+import packaging
 import werkzeug
 from loguru import logger
 
-from app.main import file_backend, storage_backend
+import app.libraries.url
+import app.routes.pypi.simple
+from app.main import database_backend, files_backend
 
 files_bp = flask.Blueprint("files", __name__, url_prefix="/file")
 
 
-@files_bp.route("/<string:filename>")
-def proxy(filename: str) -> Union[flask.Response, werkzeug.wrappers.Response]:
-    # validate hash
-    logger.debug(f"Validating URL key {filename}")
-    url = storage_backend.get_file_url_from_key(filename)
+@files_bp.route("/<string:filekey>")
+def proxy(filekey: str, recursed: bool = False) -> werkzeug.wrappers.Response:
+    # lookup file key in database
+    url = database_backend.get_file_url_from_key(filekey)
 
-    if url is None:
-        logger.info(f"URL key {filename} not found in database")
-        return flask.abort(HTTPStatus.BAD_REQUEST)
+    if url is not None:
+        # get the file
+        return files_backend.get(url)
 
-    # get the file
-    return file_backend.get(url)
+    if recursed:
+        # if this is not the first time running this, return a 404
+        return flask.abort(HTTPStatus.NOT_FOUND)
+
+    # attempt to get the file url from the package page
+    logger.warning(f"URL key {filekey} not found in database")
+
+    try:
+        project = app.libraries.url.parse_pypi_file_url(filekey)[0]
+    except ValueError:
+        # if the file key is improperly formatted, return a 404
+        return flask.abort(HTTPStatus.NOT_FOUND)
+
+    app.routes.pypi.simple.project(project)
+
+    # re-run this route
+    return proxy(filekey, recursed=True)

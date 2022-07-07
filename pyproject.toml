@@ -1,25 +1,22 @@
 [tool.poetry]
     name        = "mypypi"
-    version     = "2.0.0"
+    version     = "3.0.0"
     description = "PyPi/NPM pull-through cache"
     authors     = ["Nathan Vaughn <nvaughn51@gmail.com>"]
     readme      = "README.md"
     license     = "MIT"
 
 [tool.poetry.dependencies]
-    python          = ">=3.8,<4.0"
-    Flask           = "^2.1.2"
-    Flask-Caching   = "^2.0.0"     # additional layer of caching
-    requests        = "^2.28.1"    # HTTP requests
-    loguru          = "^0.6.0"     # logging
-    beautifulsoup4  = "^4.11.1"    # HTML parsing
-    dynaconf        = "^3.1.9"     # config
-    s3fs            = "^2022.5.0"  # S3
-    peewee          = "^3.15.0"    # SQL
-    PyMySQL         = "^1.0.2"     # MySQL
-    psycopg2-binary = "^2.9.3"     # PostgreSQL
-    redis           = "^4.3.4"     # Redis
-    packaging       = "^21.3"      # package parsing
+    python         = ">=3.8,<4.0"
+    Flask          = "^2.1.2"
+    requests       = "^2.28.1"    # HTTP requests
+    loguru         = "^0.6.0"     # logging
+    dynaconf       = "^3.1.9"     # config
+    s3fs           = "^2022.5.0"  # S3
+    redis          = "^4.3.4"     # Redis
+    packaging      = "^21.3"      # Python package parsing
+    beautifulsoup4 = "^4.11.1"    # HTML parsing
+
 
 [tool.poetry.dev-dependencies]
     black     = "^22.6"
@@ -31,7 +28,7 @@
 [[tool.poetry.source]]
     name    = "mypypi"
     url     = "https://pypi.nthnv.me/simple"
-    default = false
+    default = true
 
 [build-system]
     requires      = ["poetry-core>=1.0.0"]

@@ -1,77 +1,64 @@
 import abc
 import os
-import urllib.parse
 from http import HTTPStatus
-from typing import Generator, Union
+from typing import Generator
 
 import flask
-import packaging.utils
 import requests
 import werkzeug
 from loguru import logger
 
-import app.libraries.hash
 import app.libraries.url
-from app.main import flask_app, storage_backend
+from app.database import Database
+from app.main import flask_app
 
 
 class BaseFiles(abc.ABC):
+    def __init__(self, database: Database) -> None:
+        self.database = database
+
     def build_path(self, file_url: str) -> str:
         """
         Given a remote file url, return the path to save/load the file.
         """
-        filename = app.libraries.url.get_filename(file_url)
-
-        if flask_app.config["MODE"] == "pypi":
-            if filename.endswith(".whl"):
-                name, version, _, _ = packaging.utils.parse_wheel_filename(filename)
-            else:
-                name, version = packaging.utils.parse_sdist_filename(filename)
-
-            return os.path.join(name, str(version), filename)
+        if flask_app.config["MODE"] == "npm":
+            package, filename = app.libraries.url.parse_npm_file_url(file_url)
+            return os.path.join(*package.split("/"), filename)
         else:
-            # example url:
-            # https://registry.npmjs.org/@zzzen/pyright-internal/-/pyright-internal-1.1.254.tgz
-            parsed = urllib.parse.urlparse(file_url)
-            # path will always start with a slash
-            namespace = parsed.path[1:].split("/-/")[0]
-
-            return os.path.join(*namespace.split("/"), filename)
+            package, version = app.libraries.url.parse_pypi_file_url(file_url)
+            return os.path.join(
+                package, version, app.libraries.url.url_filename(file_url)
+            )
 
     def download(self, file_url: str) -> Generator[bytes, None, None]:
         """
         Download a remote file and return a generator of bytes.
         """
-        logger.info(f"Downloading file: {file_url}")
         response = requests.get(file_url, stream=True)
+
+        # don't save 404 data for example
+        response.raise_for_status()
+
         yield from response.iter_content(chunk_size=1024)
 
-    def in_progress(self, file_url: str) -> bool:
-        """
-        Check if there is already a task in-progress to download/upload this file url.
-        """
-        return storage_backend.check_url_download_task(file_url)
-
-    def get(self, file_url: str) -> Union[flask.Response, werkzeug.wrappers.Response]:
+    def get(self, file_url: str) -> werkzeug.wrappers.Response:
         """
         Given a remote file url, return a flask response.
         Will download the file if it does not exist.
         """
-        logger.info(f"Getting file: {file_url}")
+        # if we already have the file
         if self.check(file_url):
-            storage_backend.update_file_url_last_downloaded_time(file_url)
             return self.retrieve(file_url)
 
         # if a task not in progress
-        if not self.in_progress(file_url):
-            storage_backend.add_url_download_task(file_url)
+        if not self.database.check_file_download_job(file_url):
+            self.database.add_file_download_job(file_url)
 
         # if strict about not sending to upstream
         if flask_app.config["UPSTREAM_STRICT"]:
             return flask.abort(HTTPStatus.SERVICE_UNAVAILABLE)
 
         # redirect to original url
-        storage_backend.update_file_url_last_downloaded_time(file_url)
         logger.debug(f"Redirecting to {file_url}")
         return flask.redirect(file_url)
 

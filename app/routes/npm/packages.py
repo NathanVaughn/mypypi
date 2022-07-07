@@ -1,39 +1,47 @@
 import http
 import json
+import urllib.parse
 
 import flask
-from loguru import logger
 
-import app.libraries.proxy
-from app.main import cache
+import app.libraries.url
+from app.main import flask_app, proxy
 
 packages_bp = flask.Blueprint("packages", __name__)
 
 
-@packages_bp.route("/<path:packagename>")
-@cache.cached()
-def package(packagename: str) -> flask.Response:
-    # make request to upstream
-    logger.debug(f"Getting upstream package for {packagename}")
-    status_code, content, headers = app.libraries.proxy.reverse_proxy(
-        f"{flask.current_app.config['UPSTREAM_URL']}/{packagename}"
-    )
-    if status_code != http.HTTPStatus.OK:
-        return flask.Response(content, status_code, headers)
+@packages_bp.route("/<path:package>")
+def package(package: str) -> flask.Response:
+    # get the cached data from the upstream
+    url_cache = proxy.get(f"{flask_app.config['UPSTREAM_URL']}/{package}")
 
-    # process json
-    logger.debug(f"Processing JSON for {packagename}")
-
-    package_data = json.loads(content)
+    # if the response is bad, return as-is
+    if url_cache["status_code"] != http.HTTPStatus.OK:
+        return flask.Response(
+            url_cache["content"],
+            url_cache["status_code"],
+            url_cache["headers"],
+        )
 
     # rewrite urls
-    versions = package_data["versions"]
-    for version_data in versions.values():
-        version_data["dist"][
-            "tarball"
-        ] = app.libraries.proxy.generate_proxy_file_url_npm(
+    package_data = json.loads(url_cache["content"])
+    for version_data in package_data["versions"].values():
+        # parse the filename
+        package, filename = app.libraries.url.parse_npm_file_url(
             version_data["dist"]["tarball"]
         )
 
+        # rebuild the URL
+        version_data["dist"]["tarball"] = urllib.parse.unquote(
+            flask.url_for(
+                "files.proxy",
+                filename=filename,
+                package=package,
+                _external=True,
+            )
+        )
+
     # craft response
-    return flask.Response(json.dumps(package_data), status_code, headers)
+    return flask.Response(
+        json.dumps(package_data), url_cache["status_code"], url_cache["headers"]
+    )

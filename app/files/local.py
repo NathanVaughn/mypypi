@@ -3,11 +3,14 @@ import os
 import flask
 from loguru import logger
 
+from app.database import Database
 from app.files.base import BaseFiles
 
 
 class LocalFiles(BaseFiles):
-    def __init__(self, directory: str) -> None:
+    def __init__(self, database: Database, directory: str) -> None:
+        super().__init__(database)
+
         self.directory = os.path.abspath(directory)
         # create the the directory to save files to
         os.makedirs(self.directory, exist_ok=True)
@@ -26,7 +29,6 @@ class LocalFiles(BaseFiles):
         if os.path.exists(lock_file):
             result = False
 
-        logger.info(f"Checking if file {file_path} exists: {result}")
         return result
 
     def save(self, file_url: str) -> str:
@@ -54,8 +56,6 @@ class LocalFiles(BaseFiles):
     def retrieve(self, file_url: str) -> flask.Response:
         # make response to send the file
         file_path = self.build_path(file_url)
-        logger.info(f"Generating response URL for {file_path}")
-
         return flask.send_from_directory(
             os.path.dirname(file_path), os.path.basename(file_path), as_attachment=True
         )
