@@ -42,6 +42,7 @@ the server and worker.
 
 | Name                            | Description                                                                                                                                                                                                                                             | Default                  |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `MYPYPI_MODE`                   | Whether to run the application in `server` or `worker` mode.                                                                                                                                                                                            | `server`                 |
 | `MYPYPI_PACKAGE_TYPE`           | Whether to host `pypi` or `npm` packages.                                                                                                                                                                                                               | `pypi`                   |
 | `MYPYPI_UPSTREAM_USERNAME`      | HTTP basic auth username for upstream.                                                                                                                                                                                                                  |                          |
 | `MYPYPI_UPSTREAM_PASSWORD`      | HTTP basic auth password for upstream.                                                                                                                                                                                                                  |                          |
@@ -62,13 +63,18 @@ the server and worker.
 
 These environment variables are specific to the server.
 
+Make sure to set `MYPYPI_MODE` to `server`.
+
 | Name                     | Description                                                                                                                                                                                                                                                                                                                                            | Default                                                                         |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
 | `WORKERS`                | How many server workers to spawn to answer requests                                                                                                                                                                                                                                                                                                    | `8`                                                                             |
-| `MYPYPI_MODE`            | Whether to run the application in `server` or `worker` mode.                                                                                                                                                                                                                                                                                           | `server`                                                                        |
 | `MYPYPI_UPSTREAM_URL`    | URL of the source package index/registry. Do NOT include the trailing `/simple`.                                                                                                                                                                                                                                                                       | `https://pypi.org` in "pypi" mode or `https://registry.npmjs.org` in "npm" mode |
 | `MYPYPI_UPSTREAM_STRICT` | If `false`, will redirect requests to the upstream file source while a file is being cached the first time. If set to `true`, will return 503 until the file has been cached. `pip` usually handles this okay, but for large files, this may cause timeouts. This is good if you decided to completely block the upstream source at the network level. | `false`                                                                         |
 | `MYPYPI_CACHE_TIME`      | How long to cache upstream package information for, in seconds, before the upstream source is checked again. This will effectively limit how long it takes for new versions to appear.                                                                                                                                                                 | `300`                                                                           |
+
+### Worker Environment Variables
+
+Make sure to set `MYPYPI_MODE` to `worker`.
 
 ## Example Configs
 
@@ -80,9 +86,8 @@ MYPYPI_UPSTREAM_URL="https://pypi.org"
 
 MYPYPI_CACHE_TIME=300
 
-MYPYPI_DATA_DIRECTORY="data"
 MYPYPI_FILE_STORAGE_DRIVER="local"
-MYPYPI_FILE_STORAGE_DIRECTORY="files"
+MYPYPI_FILE_STORAGE_DIRECTORY="/app/data/files"
 
 MYPYPI_REDIS_URL="redis://localhost:6379"
 ```

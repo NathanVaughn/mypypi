@@ -156,3 +156,5 @@ data/
 
 # for docker build only
 requirements.txt
+
+.vscode/settings.json

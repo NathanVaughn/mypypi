@@ -76,7 +76,7 @@ class BaseFiles(abc.ABC):
         # redirect to original url
         logger.debug(f"Redirecting to {file_url}")
         # temporary redirect
-        return flask.redirect(file_url, code=HTTPStatus.FOUND)
+        return flask.redirect(file_url, code=HTTPStatus.TEMPORARY_REDIRECT)
 
     @abc.abstractmethod
     def check(self, file_url: str) -> bool:
