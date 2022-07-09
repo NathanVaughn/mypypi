@@ -26,10 +26,10 @@
     pyleft    = "^1.1.0"
 
 # dogfood ourselves
-[[tool.poetry.source]]
-    name    = "mypypi"
-    url     = "https://pypi.nthnv.me/simple"
-    default = true
+# [[tool.poetry.source]]
+#     name    = "mypypi"
+#     url     = "https://pypi.nthnv.me/simple"
+#     default = true
 
 [build-system]
     requires      = ["poetry-core>=1.0.0"]
