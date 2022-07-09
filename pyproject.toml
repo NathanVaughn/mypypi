@@ -1,6 +1,6 @@
 [tool.poetry]
     name        = "mypypi"
-    version     = "3.0.0"
+    version     = "3.1.0"
     description = "PyPi/NPM pull-through cache"
     authors     = ["Nathan Vaughn <nvaughn51@gmail.com>"]
     readme      = "README.md"
@@ -16,7 +16,8 @@
     redis          = "^4.3.4"     # Redis
     packaging      = "^21.3"      # Python package parsing
     beautifulsoup4 = "^4.11.1"    # HTML parsing
-
+    cachetools     = "^5.2.0"     # caching
+    orjson         = "^3.7.7"     # Fast JSON serialization
 
 [tool.poetry.dev-dependencies]
     black     = "^22.6"

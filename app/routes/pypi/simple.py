@@ -1,7 +1,8 @@
-import functools
 import http
+from urllib.parse import unquote
 
 import bs4
+import cachetools.func
 import flask
 
 import app.libraries.url
@@ -11,7 +12,7 @@ url_prefix = "simple"
 simple_bp = flask.Blueprint("simple", __name__, url_prefix=f"/{url_prefix}")
 
 
-@functools.lru_cache(maxsize=None)
+@cachetools.func.ttl_cache(maxsize=None, ttl=flask_app.config["FILE_URL_EXPIRATION"])
 def process_html(html: str) -> str:
     # parse the html
     soup = bs4.BeautifulSoup(html, "html.parser")
@@ -21,7 +22,7 @@ def process_html(html: str) -> str:
 
     # make list of all filekey, url pairs
     filekey_url_pairs = [
-        (app.libraries.url.url_filename(a_tag["href"]), a_tag["href"])
+        (app.libraries.url.url_filename(a_tag["href"], True), a_tag["href"])
         for a_tag in a_tags
     ]
 
@@ -30,10 +31,12 @@ def process_html(html: str) -> str:
 
     # rewrite the anchor tags
     for filekey_url_pair, a_tag in zip(filekey_url_pairs, a_tags):
-        a_tag["href"] = flask.url_for(
-            "files.proxy",
-            filekey=filekey_url_pair[0],
-            _external=True,
+        a_tag["href"] = unquote(
+            flask.url_for(
+                "files.proxy",
+                filekey=filekey_url_pair[0],
+                _external=True,
+            )
         )
 
     return soup.prettify()

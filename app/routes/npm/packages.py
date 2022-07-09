@@ -1,8 +1,8 @@
 import http
-import json
 import urllib.parse
 
 import flask
+import orjson
 
 import app.libraries.url
 from app.main import flask_app, proxy
@@ -24,7 +24,7 @@ def package(package: str) -> flask.Response:
         )
 
     # rewrite urls
-    package_data = json.loads(url_cache["content"])
+    package_data = orjson.loads(url_cache["content"])
     for version_data in package_data["versions"].values():
         # parse the filename
         package, filename = app.libraries.url.parse_npm_file_url(
@@ -43,5 +43,5 @@ def package(package: str) -> flask.Response:
 
     # craft response
     return flask.Response(
-        json.dumps(package_data), url_cache["status_code"], url_cache["headers"]
+        orjson.dumps(package_data), url_cache["status_code"], url_cache["headers"]
     )

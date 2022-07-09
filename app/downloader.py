@@ -36,11 +36,11 @@ class Downloader:
 
     def run(self) -> None:
         """
-        Run the Downloader infinitely. Should be started in a seperate thread.
+        Run the Downloader infinitely.
         """
         while True:
             try:
                 self.execute()
-            except Exception:
+            except Exception as e:
                 logger.exception("Downloader crashed")
-                time.sleep(5)
+                raise e

@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 import flask
-import packaging
 import werkzeug
 from loguru import logger
 

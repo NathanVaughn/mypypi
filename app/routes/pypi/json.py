@@ -1,8 +1,9 @@
-import functools
 import http
-import json
+from urllib.parse import unquote
 
+import cachetools.func
 import flask
+import orjson
 
 import app.libraries.url
 from app.main import database_backend, flask_app, proxy
@@ -12,12 +13,12 @@ url_postfix = "json"
 json_bp = flask.Blueprint("json", __name__, url_prefix=f"/{url_prefix}")
 
 
-@functools.lru_cache(maxsize=None)
-def process_json(json_data: bytes) -> str:
+@cachetools.func.ttl_cache(maxsize=None, ttl=flask_app.config["FILE_URL_EXPIRATION"])
+def process_json(json_data: str) -> str:
     """
     Rewrite all file URLs in a json page with our file proxy.
     """
-    data = json.loads(json_data)
+    data = orjson.loads(json_data)
 
     # ===================================
     # go through the urls in the releases
@@ -27,7 +28,7 @@ def process_json(json_data: bytes) -> str:
 
     # make list of all filekey, url pairs
     filekey_url_pairs = [
-        (app.libraries.url.url_filename(release_data["url"]), release_data["url"])
+        (app.libraries.url.url_filename(release_data["url"], True), release_data["url"])
         for release_data in release_datas
     ]
 
@@ -36,23 +37,27 @@ def process_json(json_data: bytes) -> str:
 
     # rewrite the release urls
     for filekey_url_pair, release_data in zip(filekey_url_pairs, release_datas):
-        release_data["url"] = flask.url_for(
-            "files.proxy",
-            filekey=filekey_url_pair[0],
-            _external=True,
+        release_data["url"] = unquote(
+            flask.url_for(
+                "files.proxy",
+                filekey=filekey_url_pair[0],
+                _external=True,
+            )
         )
 
     # ===================================
     # go through the urls in the urls
     # the file keys should have already been captured, no need to redo
     for url in data["urls"]:
-        url["url"] = flask.url_for(
-            "files.proxy",
-            filekey=app.libraries.url.url_filename(url["url"]),
-            _external=True,
+        url["url"] = unquote(
+            flask.url_for(
+                "files.proxy",
+                filekey=app.libraries.url.url_filename(url["url"], True),
+                _external=True,
+            )
         )
 
-    return json.dumps(data, indent=4)
+    return orjson.dumps(data, option=orjson.OPT_INDENT_2).decode("utf-8")
 
 
 @json_bp.route(f"/<string:projectname>/{url_postfix}")

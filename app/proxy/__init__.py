@@ -42,9 +42,9 @@ class Proxy:
             logger.error(e)
             return
 
-        # if the request had an internal server error, or other type of similar error,
+        # if the request had a bad request or other error,
         # use cache
-        if resp.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
+        if resp.status_code >= HTTPStatus.BAD_REQUEST:
             logger.error(f"Response had bad status code {resp.status_code}")
             return None
 

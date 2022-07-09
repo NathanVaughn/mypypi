@@ -5,6 +5,7 @@ from typing import Generator
 
 import flask
 import requests
+import requests.auth
 import werkzeug
 from loguru import logger
 
@@ -21,7 +22,7 @@ class BaseFiles(abc.ABC):
         """
         Given a remote file url, return the path to save/load the file.
         """
-        if flask_app.config["MODE"] == "npm":
+        if flask_app.config["PACKAGE_TYPE"] == "npm":
             package, filename = app.libraries.url.parse_npm_file_url(file_url)
             return os.path.join(*package.split("/"), filename)
         else:
@@ -34,7 +35,21 @@ class BaseFiles(abc.ABC):
         """
         Download a remote file and return a generator of bytes.
         """
-        response = requests.get(file_url, stream=True)
+        kwargs = {}
+
+        # add credentials if they are configured
+        if (
+            "UPSTREAM_USERNAME" in flask_app.config
+            and "UPSTREAM_PASSWORD" in flask_app.config
+        ):
+            kwargs["auth"] = requests.auth.HTTPBasicAuth(
+                flask_app.config["UPSTREAM_USERNAME"],
+                flask_app.config["UPSTREAM_PASSWORD"],
+            )
+
+        response = requests.get(
+            file_url, stream=True, headers={"User-Agent": "mypypi 1.0"}, **kwargs
+        )
 
         # don't save 404 data for example
         response.raise_for_status()
@@ -60,7 +75,8 @@ class BaseFiles(abc.ABC):
 
         # redirect to original url
         logger.debug(f"Redirecting to {file_url}")
-        return flask.redirect(file_url)
+        # temporary redirect
+        return flask.redirect(file_url, code=HTTPStatus.FOUND)
 
     @abc.abstractmethod
     def check(self, file_url: str) -> bool:

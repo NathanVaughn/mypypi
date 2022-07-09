@@ -23,15 +23,17 @@ def default_value(key: str, value: Any) -> None:
     flask_app.config[key] = flask_app.config.get(key, value)
 
 
-# upstream
-default_value("MODE", "pypi")
+default_value("MODE", "server")
 
-if flask_app.config["MODE"] == "pypi":
+# upstream
+default_value("PACKAGE_TYPE", "pypi")
+
+if flask_app.config["PACKAGE_TYPE"] == "pypi":
     default_value("UPSTREAM_URL", "https://pypi.org")
-elif flask_app.config["MODE"] == "npm":
+elif flask_app.config["PACKAGE_TYPE"] == "npm":
     default_value("UPSTREAM_URL", "https://registry.npmjs.org")
 else:
-    raise ValueError(f"Unknown mode: {flask_app.config['MODE']}")
+    raise ValueError(f"Unknown mode: {flask_app.config['PACKAGE_TYPE']}")
 
 flask_app.config["UPSTREAM_URL"] = flask_app.config["UPSTREAM_URL"].rstrip("/")
 
@@ -40,13 +42,26 @@ default_value("UPSTREAM_STRICT", False)
 # data
 default_value("DATA_DIRECTORY", "data")
 default_value("FILE_STORAGE_DRIVER", "local")
-default_value("FILE_STORAGE_DIRECTORY", "files")
+default_value("FILE_STORAGE_DIRECTORY", os.path.join("data", "files"))
 default_value("S3_PUBLIC", False)
+default_value("S3_KEY_TTL", 10 * 60)  # 10 minutes
+
+# determine how long file urls should be valid for, depending on file hosting type
+if (
+    flask_app.config["FILE_STORAGE_DRIVER"] == "s3"
+    and flask_app.config["S3_PUBLIC"] is False
+):
+    # non-public S3 storage will have a unique URL every time
+    # give a 60 second fudge factor
+    assert flask_app.config["S3_KEY_TTL"] > 60
+    flask_app.config["FILE_URL_EXPIRATION"] = flask_app.config["S3_KEY_TTL"] - 60
+else:
+    flask_app.config["FILE_URL_EXPIRATION"] = float("inf")
 
 # persistent storage
 default_value("REDIS_URL", "redis://localhost:6379")
 default_value("REDIS_PREFIX", "mypypi")
-default_value("CACHE_TIME", 1800)
+default_value("CACHE_TIME", 300)
 
 
 # =============================================================================
@@ -73,7 +88,6 @@ if flask_app.config["FILE_STORAGE_DRIVER"].lower() == "local":
     files_backend = app.files.local.LocalFiles(
         database_backend,
         os.path.join(
-            flask_app.config["DATA_DIRECTORY"],
             flask_app.config["FILE_STORAGE_DIRECTORY"],
         ),
     )
@@ -97,46 +111,53 @@ else:
         f"Unknown file storage driver: {flask_app.config['FILE_STORAGE_DRIVER']}"
     )
 
-# create downloader
-from app.downloader import Downloader
-
-downloader = Downloader(database_backend, files_backend)
-downloader_thread = threading.Thread(target=downloader.run)
-downloader_thread.start()
 
 # =============================================================================
-# Set up routes
+# Run
 # =============================================================================
 
-if flask_app.config["MODE"] == "pypi":
-    from app.routes.pypi.files import files_bp
-    from app.routes.pypi.json import json_bp
-    from app.routes.pypi.simple import simple_bp
+if flask_app.config["MODE"] == "worker":
+    # create downloader
+    from app.downloader import Downloader
 
-    # pypi routes
-    flask_app.register_blueprint(simple_bp)
-    flask_app.register_blueprint(json_bp)
+    downloader = Downloader(database_backend, files_backend)
 
-    # our internal routes
-    flask_app.register_blueprint(files_bp)
+elif flask_app.config["MODE"] == "server":
+    # =============================================================================
+    # Routes
+    # =============================================================================
+
+    if flask_app.config["PACKAGE_TYPE"] == "pypi":
+        from app.routes.pypi.files import files_bp
+        from app.routes.pypi.json import json_bp
+        from app.routes.pypi.simple import simple_bp
+
+        # pypi routes
+        flask_app.register_blueprint(simple_bp)
+        flask_app.register_blueprint(json_bp)
+
+        # our internal routes
+        flask_app.register_blueprint(files_bp)
+
+    else:
+        from app.routes.npm.files import files_bp
+        from app.routes.npm.packages import packages_bp
+
+        # npm routes
+        flask_app.register_blueprint(files_bp)
+        flask_app.register_blueprint(packages_bp)
+
+    # =============================================================================
+    # Hooks
+    # =============================================================================
+
+    @flask_app.after_request
+    def _log_request(response: Response) -> Response:
+        """
+        After each request, log the path and response code.
+        """
+        logger.info(f"{request.method} {request.full_path} {response.status_code}")
+        return response
 
 else:
-    from app.routes.npm.files import files_bp
-    from app.routes.npm.packages import packages_bp
-
-    # npm routes
-    flask_app.register_blueprint(files_bp)
-    flask_app.register_blueprint(packages_bp)
-
-# =============================================================================
-# Hooks
-# =============================================================================
-
-
-@flask_app.after_request
-def _log_request(response: Response) -> Response:
-    """
-    After each request, log the path and response code.
-    """
-    logger.info(f"{request.method} {request.full_path} {response.status_code}")
-    return response
+    raise ValueError(f"Unknown mode: {flask_app.config['MODE']}")

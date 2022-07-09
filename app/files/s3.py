@@ -1,6 +1,8 @@
+import http
 import urllib.parse
-from typing import Optional, Union
+from typing import Optional
 
+import cachetools.func
 import flask
 import s3fs
 import werkzeug
@@ -8,6 +10,7 @@ from loguru import logger
 
 from app.database import Database
 from app.files.base import BaseFiles
+from app.main import flask_app
 
 
 class S3Files(BaseFiles):
@@ -61,13 +64,14 @@ class S3Files(BaseFiles):
             for chunk in self.download(file_url):
                 f.write(chunk)
 
-        return self.fs.url(file_path, expires=10 * 60)  # type: ignore
+        return self.fs.url(file_path, expires=flask_app.config["S3_KEY_TTL"])
 
-    def retrieve(
-        self, file_url: str
-    ) -> Union[flask.Response, werkzeug.wrappers.Response]:
+    @cachetools.func.ttl_cache(
+        maxsize=None, ttl=flask_app.config["FILE_URL_EXPIRATION"]
+    )
+    def retrieve(self, file_url: str) -> werkzeug.wrappers.Response:
         file_path = self.build_path(file_url)
-        return_url = self.fs.url(file_path, expires=10 * 60)
+        return_url: str = self.fs.url(file_path, expires=flask_app.config["S3_KEY_TTL"])
 
         if self._is_public:
             # remove the query parameters from the url, so pip
@@ -75,8 +79,12 @@ class S3Files(BaseFiles):
             return_url_parsed = urllib.parse.urlparse(return_url)
             return_url = return_url_parsed._replace(query="").geturl()
 
-        logger.info(f"Redirecting to {return_url}")
-        return flask.redirect(return_url)
+        redirect_code = http.HTTPStatus.TEMPORARY_REDIRECT
+        if self._is_public:
+            redirect_code = http.HTTPStatus.PERMANENT_REDIRECT
+
+        logger.info(f"Redirecting to {return_url} with code {redirect_code}")
+        return flask.redirect(return_url, code=redirect_code)
 
     def delete(self, file_url: str) -> None:
         file_path = self.build_path(file_url)

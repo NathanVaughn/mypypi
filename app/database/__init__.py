@@ -1,7 +1,7 @@
 import datetime
-import json
 from typing import List, Optional, Tuple
 
+import orjson
 from redis import Redis
 
 from app.main import flask_app
@@ -13,12 +13,19 @@ class Database:
         self.redis_client = redis_client
 
         self._redis_prefix = (
-            f"{flask_app.config['REDIS_PREFIX']}:{flask_app.config['MODE']}"
+            f"{flask_app.config['REDIS_PREFIX']}:{flask_app.config['PACKAGE_TYPE']}"
         )
         self._data_sep = "data"
         self._time_sep = "time"
         self._file_url_sep = "file_url"
         self._file_download_queue_name = "file_download_queue"
+
+    @staticmethod
+    def process_key(key: str) -> str:
+        """
+        Process a Redis key to replace colons with something else.
+        """
+        return key.replace(":", "_")
 
     # url cache
 
@@ -28,11 +35,12 @@ class Database:
         """
         # record the actual data
         self.redis_client.set(
-            f"{self._redis_prefix}:{self._data_sep}:{url}", json.dumps(data)
+            f"{self._redis_prefix}:{self._data_sep}:{self.process_key(url)}",
+            orjson.dumps(data).decode("utf-8"),
         )
         # record the time of the data
         self.redis_client.set(
-            f"{self._redis_prefix}:{self._time_sep}:{url}",
+            f"{self._redis_prefix}:{self._time_sep}:{self.process_key(url)}",
             datetime.datetime.now().isoformat(),
         )
 
@@ -42,17 +50,19 @@ class Database:
         """
         Get URL cache data from the redis cache.
         """
-        data = self.redis_client.get(f"{self._redis_prefix}:{self._data_sep}:{url}")
+        data = self.redis_client.get(
+            f"{self._redis_prefix}:{self._data_sep}:{self.process_key(url)}"
+        )
         if data is None:
             return (None, None)
 
         timestamp = self.redis_client.get(
-            f"{self._redis_prefix}:{self._time_sep}:{url}"
+            f"{self._redis_prefix}:{self._time_sep}:{self.process_key(url)}"
         )
         if timestamp is None:
             return (None, None)
 
-        return datetime.datetime.fromisoformat(timestamp), json.loads(data)
+        return datetime.datetime.fromisoformat(timestamp), orjson.loads(data)
 
     # file download jobs
 
@@ -98,7 +108,8 @@ class Database:
         Add entry of a key that we can use to look up the source file URL later.
         """
         self.redis_client.set(
-            f"{self._redis_prefix}:{self._file_url_sep}:{filekey}", url
+            f"{self._redis_prefix}:{self._file_url_sep}:{self.process_key(filekey)}",
+            url,
         )
 
     def bulk_add_file_url_keys(self, entries: List[Tuple[str, str]]) -> None:
@@ -107,7 +118,10 @@ class Database:
         """
         pipe = self.redis_client.pipeline()
         for filekey, url in entries:
-            pipe.set(f"{self._redis_prefix}:{self._file_url_sep}:{filekey}", url)
+            pipe.set(
+                f"{self._redis_prefix}:{self._file_url_sep}:{self.process_key(filekey)}",
+                url,
+            )
 
         pipe.execute()
 
@@ -116,5 +130,5 @@ class Database:
         Get the source file URL from a key.
         """
         return self.redis_client.get(
-            f"{self._redis_prefix}:{self._file_url_sep}:{filekey}"
+            f"{self._redis_prefix}:{self._file_url_sep}:{self.process_key(filekey)}"
         )

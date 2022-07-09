@@ -21,7 +21,7 @@ jobs:
         run: echo "MYPYPI_VERSION=$(poetry version --short)" >> $GITHUB_ENV
 
       - name: Export requirements
-        run: poetry export -o requirements.txt
+        run: poetry export -o requirements.txt --without-hashes
 
       - name: Dockerhub Login
         uses: docker/login-action@v2

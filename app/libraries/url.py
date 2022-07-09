@@ -5,11 +5,17 @@ from urllib.parse import urlparse
 import packaging.utils
 
 
-def url_filename(url: str) -> str:
+def url_filename(url: str, keep_anchor: bool = False) -> str:
     """
-    Given a url, return the filename.
+    Given a url, return the filename. Optionally keep the anchor.
     """
-    return os.path.basename(urlparse(url).path)
+    parsed = urlparse(url)
+    filename = os.path.basename(parsed.path)
+
+    if keep_anchor:
+        filename = f"{filename}#{parsed.fragment}"
+
+    return filename
 
 
 def parse_npm_file_url(url: str) -> Tuple[str, str]:

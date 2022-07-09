@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+    redis:
+        image: docker.io/library/redis
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+
+    worker:
+        depends_on:
+            - redis
+        build: .
+        image: docker.io/nathanvaughn/mypypi
+        environment:
+            MYPYPI_REDIS_URL: redis://redis:6379
+            MYPYPI_MODE: worker
+            MYPYPI_PACKAGE_TYPE: pypi
+        restart: on-failure
+        volumes:
+            - mypypi_data:/app/data/
+
+    server:
+        depends_on:
+            - redis
+        build: .
+        image: docker.io/nathanvaughn/mypypi
+        ports:
+            - "5000:80"
+        environment:
+            MYPYPI_REDIS_URL: redis://redis:6379
+            MYPYPI_MODE: server
+            MYPYPI_PACKAGE_TYPE: pypi
+        restart: on-failure
+        volumes:
+            - mypypi_data:/app/data/
+
+volumes:
+    redis_data:
+    mypypi_data:
