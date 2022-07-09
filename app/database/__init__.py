@@ -123,6 +123,13 @@ class Database:
                 url,
             )
 
+            # if in pypi mode, also make duplicate without the anchor
+            if flask_app.config["PACKAGE_TYPE"] == "pypi" and "#" in filekey:
+                pipe.set(
+                    f"{self._redis_prefix}:{self._file_url_sep}:{self.process_key(filekey.split('#')[0])}",
+                    url,
+                )
+
         pipe.execute()
 
     def get_file_url_from_key(self, filekey: str) -> Optional[str]:
