@@ -79,9 +79,9 @@ class S3Files(BaseFiles):
             return_url_parsed = urllib.parse.urlparse(return_url)
             return_url = return_url_parsed._replace(query="").geturl()
 
-        redirect_code = http.HTTPStatus.TEMPORARY_REDIRECT
+        redirect_code = http.HTTPStatus.FOUND
         if self._is_public:
-            redirect_code = http.HTTPStatus.PERMANENT_REDIRECT
+            redirect_code = http.HTTPStatus.MOVED_PERMANENTLY
 
         logger.info(f"Redirecting to {return_url} with code {redirect_code}")
         return flask.redirect(return_url, code=redirect_code)
