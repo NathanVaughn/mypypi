@@ -1,5 +1,4 @@
 import os
-import threading
 from typing import Any
 
 from dynaconf import FlaskDynaconf
@@ -141,9 +140,11 @@ elif flask_app.config["MODE"] == "server":
 
     else:
         from app.routes.npm.files import files_bp
+        from app.routes.npm.keys import keys_bp
         from app.routes.npm.packages import packages_bp
 
         # npm routes
+        flask_app.register_blueprint(keys_bp)
         flask_app.register_blueprint(files_bp)
         flask_app.register_blueprint(packages_bp)
 
