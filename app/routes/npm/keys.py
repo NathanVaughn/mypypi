@@ -1,5 +1,4 @@
 import flask
-import orjson
 import werkzeug
 
 from app.main import flask_app, proxy
@@ -13,5 +12,5 @@ def keys() -> werkzeug.wrappers.Response:
 
     # craft response
     return flask.Response(
-        orjson.dumps(url_cache["content"]), url_cache["status_code"], url_cache["headers"]
+        url_cache["content"], url_cache["status_code"], url_cache["headers"]
     )
