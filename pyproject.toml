@@ -11,7 +11,7 @@
     Flask          = "^2.2.2"
     requests       = "^2.28.1"    # HTTP requests
     loguru         = "^0.6.0"     # logging
-    dynaconf       = "^3.1.9"     # config
+    dynaconf       = "^3.1.11"     # config
     s3fs           = "^2022.8.2"  # S3
     redis          = "^4.3.4"     # Redis
     packaging      = "^21.3"      # Python package parsing
