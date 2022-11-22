@@ -13,7 +13,7 @@
     loguru         = "^0.6.0"     # logging
     dynaconf       = "^3.1.11"     # config
     s3fs           = "^2022.11.0"  # S3
-    redis          = "^4.3.4"     # Redis
+    redis          = "^4.3.5"     # Redis
     packaging      = "^21.3"      # Python package parsing
     beautifulsoup4 = "^4.11.1"    # HTML parsing
     cachetools     = "^5.2.0"     # caching
