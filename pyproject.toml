@@ -22,7 +22,7 @@
 [tool.poetry.dev-dependencies]
     black     = "^22.10"
     isort     = "^5.10.1"
-    autoflake = "^1.7"
+    autoflake = "^2.0"
     pyleft    = "^1.1.0"
 
 # dogfood ourselves
