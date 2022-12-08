@@ -14,7 +14,7 @@
     dynaconf       = "^3.1.11"     # config
     s3fs           = "^2022.11.0"  # S3
     redis          = "^4.4.0"     # Redis
-    packaging      = "^21.3"      # Python package parsing
+    packaging      = "^22.0"      # Python package parsing
     beautifulsoup4 = "^4.11.1"    # HTML parsing
     cachetools     = "^5.2.0"     # caching
     orjson         = "^3.8.3"     # Fast JSON serialization
