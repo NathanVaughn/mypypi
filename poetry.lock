@@ -420,11 +420,11 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "pyleft"
-version = "1.1.1"
+version = "1.1.3"
 description = "Python type annotation existence checker"
 category = "dev"
 optional = false
-python-versions = ">=3.6.2,<4.0"
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
 pathspec = ">=0.9.0"
@@ -596,7 +596,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "b41c06ad4f321751bca1b72753e4dc58ea92953a6beb6c7a26750fcd992342fc"
+content-hash = "c05973525f16e2ec4b827e122ba8712c6337a84688af2cacec5e633da180dd68"
 
 [metadata.files]
 aiobotocore = [
@@ -1040,8 +1040,8 @@ pyflakes = [
     {file = "pyflakes-3.0.1.tar.gz", hash = "sha256:ec8b276a6b60bd80defed25add7e439881c19e64850afd9b346283d4165fd0fd"},
 ]
 pyleft = [
-    {file = "pyleft-1.1.1-py3-none-any.whl", hash = "sha256:d0d6460792c9d672c843e4bf55a3c2dc7d158387cbc05e0fcec274b9d6a33abc"},
-    {file = "pyleft-1.1.1.tar.gz", hash = "sha256:fe401109ee356c7e5274633417a8d2acdbb1108dd9d60398ec833c0ddd9e2bff"},
+    {file = "pyleft-1.1.3-py3-none-any.whl", hash = "sha256:7a2e35645662161896deddf17567173a30e49a2a93add4a2d038ed19475e10de"},
+    {file = "pyleft-1.1.3.tar.gz", hash = "sha256:0866d33b423dbd97ccab3b7ce118d2f2754b49898c6e6ba5250a520d68b100f0"},
 ]
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},

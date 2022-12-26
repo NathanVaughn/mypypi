@@ -23,7 +23,7 @@
     black     = "^22.12"
     isort     = "^5.11.4"
     autoflake = "^2.0"
-    pyleft    = "^1.1.0"
+    pyleft    = "^1.1.3"
 
 # dogfood ourselves
 # [[tool.poetry.source]]
