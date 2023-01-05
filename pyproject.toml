@@ -17,7 +17,7 @@
     packaging      = "^22.0"      # Python package parsing
     beautifulsoup4 = "^4.11.1"    # HTML parsing
     cachetools     = "^5.2.0"     # caching
-    orjson         = "^3.8.3"     # Fast JSON serialization
+    orjson         = "^3.8.4"     # Fast JSON serialization
 
 [tool.poetry.dev-dependencies]
     black     = "^22.12"
